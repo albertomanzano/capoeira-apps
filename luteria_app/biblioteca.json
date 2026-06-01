@@ -1,0 +1,30 @@
+{
+  "cabacas": [
+    {
+      "name": "Gunca",
+      "f_H": 370.0,
+      "V_ml": 2600.0,
+      "d_mm": 60.0,
+      "date": "2026-04-30"
+    }
+  ],
+  "biribas": [],
+  "arames": [
+    {
+      "name": "START 0.8mm",
+      "brand": "START",
+      "calibre": "0.8mm",
+      "mu": 0.0039458,
+      "material": "Acero EN 10270-1",
+      "date": "2026-04-30"
+    },
+    {
+      "name": "START 1.0mm",
+      "brand": "START",
+      "calibre": "1.0mm",
+      "mu": 0.0061654,
+      "material": "Acero EN 10270-1",
+      "date": "2026-04-30"
+    }
+  ]
+}

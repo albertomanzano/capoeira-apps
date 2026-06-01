@@ -1,0 +1,30 @@
+# Virtualenv
+atabaque_venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Flet build artifacts
+luteria_app/build/
+entrenamiento_app/build/
+
+# APKs (se distribuyen como GitHub Releases)
+*.apk
+
+# Web
+web_colectivo/node_modules/
+web_colectivo/.svelte-kit/
+web_colectivo/build/
+web_colectivo/.env
+web_colectivo/.env.*
+web_colectivo/.netlify/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sesión local de Supabase
+.cap_entreno.json

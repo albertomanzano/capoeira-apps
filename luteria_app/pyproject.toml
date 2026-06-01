@@ -1,0 +1,17 @@
+[project]
+name = "lutheria"
+dependencies = [
+  "flet==0.84.0",
+  "numpy",
+  "matplotlib",
+  "certifi",
+  "pyjnius",
+]
+
+[tool.flet]
+org = "com.luteria"
+product = "Lutería"
+description = "App de luthería para berimbau"
+
+[tool.flet.permissions]
+microphone = true
