@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { user, loading } from '$lib/stores/auth';
+	import { user, role, loading } from '$lib/stores/auth';
 
 	$effect(() => {
 		if ($loading) return;
-		goto($user ? '/rutinas' : '/login');
+		goto($user ? ($role === 'profe' ? '/alumnos' : '/rutinas') : '/descargas');
 	});
 </script>
