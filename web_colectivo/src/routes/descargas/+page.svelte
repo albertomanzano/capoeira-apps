@@ -1,5 +1,6 @@
 <script lang="ts">
-	const LUTERIA_APK = 'https://github.com/albertomanzano/capoeira-apps/releases/download/v1.0-luteria/lutheria.apk';
+	const LUTERIA_APK       = 'https://github.com/albertomanzano/capoeira-apps/releases/download/v1.0-luteria/lutheria.apk';
+	const ENTRENAMIENTO_APK = 'https://github.com/albertomanzano/capoeira-apps/releases/download/v1.0-entrenamiento/entrenamiento.apk';
 </script>
 
 <svelte:head>
@@ -25,14 +26,16 @@
 			</a>
 		</div>
 
-		<div class="card card--soon">
+		<div class="card">
 			<div class="card-icon">🥋</div>
 			<div class="card-body">
 				<h2>Entrenamiento</h2>
 				<p>Timer para clases, registro de marcas por ejercicio e historial de progreso individual.</p>
-				<div class="meta">Android · En desarrollo</div>
+				<div class="meta">Android · Python/Flet · v1.0</div>
 			</div>
-			<span class="btn-soon">Próximamente</span>
+			<a href={ENTRENAMIENTO_APK} class="btn-download" download>
+				Descargar APK
+			</a>
 		</div>
 	</div>
 

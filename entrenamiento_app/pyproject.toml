@@ -1,0 +1,13 @@
+[project]
+name = "entrenamiento"
+dependencies = [
+  "flet==0.84.0",
+  "supabase",
+  "numpy",
+  "certifi",
+]
+
+[tool.flet]
+org = "com.capoeira"
+product = "Entrenamiento"
+description = "App de entrenamiento Capoeira"
