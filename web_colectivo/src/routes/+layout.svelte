@@ -9,7 +9,7 @@
 	$effect(() => {
 		if ($loading) return;
 		const path = $page.url.pathname;
-		const publicPaths = ['/login', '/registro', '/reset-password'];
+		const publicPaths = ['/login', '/registro', '/reset-password', '/descargas'];
 		if (!$user && !publicPaths.includes(path)) { goto('/login'); return; }
 		if ($user && $role !== 'profe' && (path === '/alumnos' || path.startsWith('/alumnos/'))) {
 			goto('/rutinas');
