@@ -10,6 +10,12 @@ Tres líneas de trabajo:
 
 3. **Web del Colectivo** — web pública del colectivo que integra login de alumnos para ver sus stats de entrenamiento y link de descarga de la app de luthería.
 
+## Responsabilidades de Claude
+
+- **Git**: hacer commit y push a `origin/main` después de cada sesión de cambios. El repositorio es `https://github.com/albertomanzano/capoeira-apps.git`. Alberto no gestiona git directamente.
+- **Deploy web**: desplegar a Netlify (o el hosting activo) después de cada cambio en `web_colectivo/`. Comando: `npx netlify-cli deploy --prod --dir=build` desde `web_colectivo/`.
+- **Supabase**: verificar que las migraciones SQL necesarias están documentadas y recordar a Alberto ejecutarlas si el schema cambia.
+
 ## Tracking por proyecto
 
 - `tracking/luteria.md` — estado y pendientes de la app de luthería
@@ -115,6 +121,7 @@ La vista llama `sweep_h1_once` en executor sweep a sweep (no bloqueante), actual
 - `ft.Image` requiere `src` obligatorio — no instanciar sin él
 - `NavigationBar` + switching manual (no `ft.Tabs` con lista)
 - Threading: `async def main` + `page.run_task()` + `run_in_executor` — `threading.Thread` no hace flush de `page.update()`
+- Colores: usar siempre hex de 6 dígitos (`"#ffffff"`, `"#333333"`) — los de 3 dígitos (`"#fff"`, `"#333"`) hacen el texto invisible en Android
 
 ## Física del berimbau (resumen)
 
