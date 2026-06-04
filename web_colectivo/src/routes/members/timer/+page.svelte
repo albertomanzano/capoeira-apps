@@ -3,15 +3,13 @@
 	import { supabase } from '$lib/supabase';
 	import Shell from '$lib/Shell.svelte';
 
-	type ExData    = { name: string; duration_s: number };
+	type ExData     = { name: string; duration_s: number };
 	type BloqueData = { name: string; exercises: ExData[] };
 	type RutinaData = { name: string; exercises: BloqueData[] };
 
 	const CFG_KEY = 'capoeira_timer_config';
-	const CFG_DEFAULTS = { exercises: 7, exerciseMin: 1, pauseSec: 30, rounds: 2, roundBreakSec: 60 };
+	const CFG_DEFAULTS = { pauseSec: 30, rounds: 2, roundBreakSec: 60 };
 	const CFG_LIMITS = {
-		exercises:     { min: 1,  max: 12,  step: 1  },
-		exerciseMin:   { min: 1,  max: 10,  step: 1  },
 		pauseSec:      { min: 10, max: 120, step: 5  },
 		rounds:        { min: 1,  max: 5,   step: 1  },
 		roundBreakSec: { min: 0,  max: 300, step: 30 },
@@ -21,6 +19,7 @@
 	let routineBloque = $state<BloqueData | null>(null);
 	let routineData   = $state<RutinaData | null>(null);
 	let routineMeta   = $state<{ routine_id: string; routine_name: string } | null>(null);
+	let mounted       = $state(false);
 
 	function loadCfg() {
 		const raw = typeof localStorage !== 'undefined' && localStorage.getItem(CFG_KEY);
@@ -63,24 +62,25 @@
 			});
 			return phases;
 		}
-		const exList = routineBloque
-			? routineBloque.exercises.map(e => ({ name: e.name, dur: e.duration_s }))
-			: Array.from({ length: cfg.exercises }, (_, i) => ({ name: `Ejercicio ${i + 1}`, dur: cfg.exerciseMin * 60 }));
-		return buildPhasesFromExList(exList);
+		if (routineBloque) {
+			return buildPhasesFromExList(routineBloque.exercises.map(e => ({ name: e.name, dur: e.duration_s })));
+		}
+		return [{ name: '', type: 'ejercicio', duration: 60 }];
 	}
 
-	let PHASES        = $state(buildPhases());
-	let ROUNDS        = $derived(cfg.rounds);
+	let PHASES       = $state(buildPhases());
+	// rutina completa: sus bloques ya están en secuencia, se ejecuta una sola vez
+	let ROUNDS       = $derived(routineData ? 1 : cfg.rounds);
+	let noRoutine    = $derived(mounted && !routineData && !routineBloque);
 
-	let round         = $state(0);
-	let phase         = $state(0);
-	let timeLeft      = $state(PHASES[0].duration);
-	let running       = $state(false);
-	let finished      = $state(false);
-	let inRoundBreak  = $state(false);
-	let started       = $state(false);
+	let round        = $state(0);
+	let phase        = $state(0);
+	let timeLeft     = $state(PHASES[0].duration);
+	let running      = $state(false);
+	let finished     = $state(false);
+	let inRoundBreak = $state(false);
+	let started      = $state(false);
 
-	// marks state
 	let marks        = $state<(number | null)[]>([]);
 	let currentExIdx = $state(0);
 	let lastExName   = $state('');
@@ -93,15 +93,15 @@
 	let audioCtx: AudioContext | null = null;
 	let ticker: ReturnType<typeof setInterval> | null = null;
 
-	const curDuration = $derived(inRoundBreak ? cfg.roundBreakSec : PHASES[phase].duration);
-	const elapsed     = $derived(curDuration - timeLeft);
-	const pct         = $derived(Math.max(0, (elapsed / curDuration) * 100));
-	const isPausa     = $derived(!inRoundBreak && PHASES[phase].type === 'pausa');
-	const timerText   = $derived(`${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, '0')}`);
-	const nextPhase   = $derived(PHASES[phase + 1]);
-	const nextIsRound = $derived(phase + 1 >= PHASES.length);
-	const isLast      = $derived(nextIsRound && round >= ROUNDS - 1);
-	const nextInfo    = $derived(
+	const curDuration    = $derived(inRoundBreak ? cfg.roundBreakSec : PHASES[phase].duration);
+	const elapsed        = $derived(curDuration - timeLeft);
+	const pct            = $derived(Math.max(0, (elapsed / curDuration) * 100));
+	const isPausa        = $derived(!inRoundBreak && PHASES[phase].type === 'pausa');
+	const timerText      = $derived(`${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, '0')}`);
+	const nextPhase      = $derived(PHASES[phase + 1]);
+	const nextIsRound    = $derived(phase + 1 >= PHASES.length);
+	const isLast         = $derived(nextIsRound && round >= ROUNDS - 1);
+	const nextInfo       = $derived(
 		finished       ? '' :
 		inRoundBreak   ? `A continuación: Bloque ${round + 2}` :
 		isLast         ? 'Último ejercicio' :
@@ -109,7 +109,6 @@
 		nextPhase?.type === 'pausa' ? 'A continuación: Pausa' :
 		`A continuación: ${nextPhase?.name}`
 	);
-
 	const hasRoutine     = $derived(!!(routineBloque || routineData));
 	const showMarkInput  = $derived(
 		hasRoutine && started && !finished && marks.length > 0 && currentExIdx < marks.length
@@ -308,6 +307,7 @@
 		}
 		PHASES = buildPhases();
 		timeLeft = PHASES[0].duration;
+		mounted = true;
 		if (window.speechSynthesis) {
 			window.speechSynthesis.onvoiceschanged = populateVoices;
 			populateVoices();
@@ -321,140 +321,155 @@
 </script>
 
 <Shell tab="timer">
-	{#if routineData}
-		<p class="routine-pill">▶ {routineData.name}</p>
-	{:else if routineBloque}
-		<p class="routine-pill">{routineBloque.name || 'Bloque'}</p>
-	{/if}
-
-	{#if !finished}
-		<div class="timer-wrap">
-			{#if inRoundBreak}
-				<p class="round-info">Descanso entre bloques</p>
-				<p class="phase-label round-break">Bloque {round + 1} → {round + 2}</p>
-				<p class="phase-name"></p>
-			{:else}
-				<p class="round-info">
-					{#if routineData && PHASES[phase]?.bloque}
-						{PHASES[phase].bloque}
-					{:else}
-						Bloque {round + 1} de {ROUNDS}
-					{/if}
-				</p>
-				<p class="phase-label {isPausa ? 'pausa' : ''}">{isPausa ? 'Pausa' : 'Ejercicio'}</p>
-				<p class="phase-name">{isPausa ? '' : PHASES[phase].name}</p>
-			{/if}
-
-			<p class="timer {isPausa ? 'pausa' : ''} {inRoundBreak ? 'round-break' : ''} {!isPausa && !inRoundBreak && timeLeft <= 5 ? 'warning' : ''}">
-				{timerText}
-			</p>
-
-			<div class="bar-wrap">
-				<div class="bar {isPausa ? 'pausa' : ''} {inRoundBreak ? 'round-break' : ''} {!isPausa && !inRoundBreak && timeLeft <= 5 ? 'warning' : ''}"
-					style="width: {pct}%"></div>
-			</div>
-
-			{#if showMarkInput}
-				<div class="mark-row">
-					<span class="mark-ex-name">{lastExName}</span>
-					<input
-						type="number"
-						inputmode="numeric"
-						placeholder="reps"
-						value={marks[currentExIdx] ?? ''}
-						oninput={(e) => { marks[currentExIdx] = e.currentTarget.value ? Number(e.currentTarget.value) : null; }}
-						class="mark-input-timer"
-					/>
-				</div>
-			{/if}
-
-			{#if routineData}
-				<div class="dots-rutina">
-					{#each routineData.exercises as bloque}
-						{@const bloquePhases = PHASES.map((p, i) => ({ ...p, i })).filter(p => p.bloque === bloque.name)}
-						<div class="dots-row">
-							{#if bloque.name}<span class="dots-label">{bloque.name}</span>{/if}
-							<div class="dots">
-								{#each bloquePhases as p}
-									<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {p.i < phase ? 'done' : ''} {p.i === phase && !inRoundBreak ? 'current' : ''}"></div>
-								{/each}
-							</div>
-						</div>
-					{/each}
-				</div>
-			{:else}
-				<div class="dots">
-					{#each PHASES as p, i}
-						<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {i < phase ? 'done' : ''} {i === phase && !inRoundBreak ? 'current' : ''}"></div>
-					{/each}
-				</div>
-			{/if}
-
-			<p class="next-info">{nextInfo}</p>
-
-			<div class="controls">
-				<button class="btn-start {running ? 'running' : ''}" onclick={startStop}>
-					{running ? 'Pausar' : started ? 'Continuar' : 'Empezar'}
-				</button>
-				<button class="btn-reset" onclick={rebuildAndReset}>Reset</button>
-			</div>
+	{#if noRoutine}
+		<div class="no-routine">
+			<p class="no-routine-text">Lanza el entrenamiento desde una rutina.</p>
+			<a href="/members/rutinas" class="btn-go">Ver rutinas</a>
 		</div>
+
 	{:else}
-		<div class="finished">
-			<p class="finished-title">¡Completado!</p>
-			<p class="finished-sub">{ROUNDS} bloque{ROUNDS !== 1 ? 's' : ''} terminado{ROUNDS !== 1 ? 's' : ''}</p>
-			{#if routineMeta && !logSaved}
-				<button class="btn-save-log" onclick={saveLog} disabled={logBusy}>
-					{logBusy ? 'Guardando…' : 'Guardar entreno'}
-				</button>
-			{:else if logSaved}
-				<p class="log-saved">✓ Guardado en historial</p>
-			{/if}
-			<button class="btn-start" onclick={rebuildAndReset}>Volver a empezar</button>
-		</div>
-	{/if}
+		{#if routineData}
+			<p class="routine-pill">▶ {routineData.name}</p>
+		{:else if routineBloque}
+			<p class="routine-pill">{routineBloque.name || 'Bloque'}</p>
+		{/if}
 
-	<details class="config-settings" class:disabled={running}>
-		<summary>Configurar</summary>
-		<div class="config-panel">
-			{#each [
-				{ key: 'exercises',     label: 'Ejercicios',           hide: !!routineBloque },
-				{ key: 'exerciseMin',   label: 'Min / ejercicio',      hide: !!routineBloque },
-				{ key: 'pauseSec',      label: 'Pausa (s)',            hide: false },
-				{ key: 'rounds',        label: 'Bloques',              hide: false },
-				{ key: 'roundBreakSec', label: 'Descanso bloques (s)', hide: false },
-			] as row}
-				{#if !row.hide}
-					<div class="cfg-row">
-						<span class="cfg-label">{row.label}</span>
-						<div class="stepper">
-							<button onclick={() => adjustCfg(row.key as keyof typeof cfg, -1)} disabled={running}>−</button>
-							<span>{cfg[row.key as keyof typeof cfg]}</span>
-							<button onclick={() => adjustCfg(row.key as keyof typeof cfg, 1)} disabled={running}>+</button>
-						</div>
+		{#if !finished}
+			<div class="timer-wrap">
+				{#if inRoundBreak}
+					<p class="round-info">Descanso entre bloques</p>
+					<p class="phase-label round-break">Bloque {round + 1} → {round + 2}</p>
+					<p class="phase-name"></p>
+				{:else}
+					<p class="round-info">
+						{#if routineData && PHASES[phase]?.bloque}
+							{PHASES[phase].bloque}
+						{:else}
+							Bloque {round + 1} de {ROUNDS}
+						{/if}
+					</p>
+					<p class="phase-label {isPausa ? 'pausa' : ''}">{isPausa ? 'Pausa' : 'Ejercicio'}</p>
+					<p class="phase-name">{isPausa ? '' : PHASES[phase].name}</p>
+				{/if}
+
+				<p class="timer {isPausa ? 'pausa' : ''} {inRoundBreak ? 'round-break' : ''} {!isPausa && !inRoundBreak && timeLeft <= 5 ? 'warning' : ''}">
+					{timerText}
+				</p>
+
+				<div class="bar-wrap">
+					<div class="bar {isPausa ? 'pausa' : ''} {inRoundBreak ? 'round-break' : ''} {!isPausa && !inRoundBreak && timeLeft <= 5 ? 'warning' : ''}"
+						style="width: {pct}%"></div>
+				</div>
+
+				{#if showMarkInput}
+					<div class="mark-row">
+						<span class="mark-ex-name">{lastExName}</span>
+						<input
+							type="number"
+							inputmode="numeric"
+							placeholder="reps"
+							value={marks[currentExIdx] ?? ''}
+							oninput={(e) => { marks[currentExIdx] = e.currentTarget.value ? Number(e.currentTarget.value) : null; }}
+							class="mark-input-timer"
+						/>
 					</div>
 				{/if}
-			{/each}
-			{#if running}<p class="cfg-note">Para cambiar: pausar y hacer reset</p>{/if}
-		</div>
-	</details>
 
-	<details class="voice-settings">
-		<summary>Voz</summary>
-		<div class="voice-panel">
-			<select class="voice-select"
-				value={voices.indexOf(selectedVoice!)}
-				onchange={(e) => selectVoice(parseInt(e.currentTarget.value))}>
-				{#each voices as v, i}
-					<option value={i}>{v.name} ({v.lang})</option>
+				{#if routineData}
+					<div class="dots-rutina">
+						{#each routineData.exercises as bloque}
+							{@const bloquePhases = PHASES.map((p, i) => ({ ...p, i })).filter(p => p.bloque === bloque.name)}
+							<div class="dots-row">
+								{#if bloque.name}<span class="dots-label">{bloque.name}</span>{/if}
+								<div class="dots">
+									{#each bloquePhases as p}
+										<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {p.i < phase ? 'done' : ''} {p.i === phase && !inRoundBreak ? 'current' : ''}"></div>
+									{/each}
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<div class="dots">
+						{#each PHASES as p, i}
+							<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {i < phase ? 'done' : ''} {i === phase && !inRoundBreak ? 'current' : ''}"></div>
+						{/each}
+					</div>
+				{/if}
+
+				<p class="next-info">{nextInfo}</p>
+
+				<div class="controls">
+					<button class="btn-start {running ? 'running' : ''}" onclick={startStop}>
+						{running ? 'Pausar' : started ? 'Continuar' : 'Empezar'}
+					</button>
+					<button class="btn-reset" onclick={rebuildAndReset}>Reset</button>
+				</div>
+			</div>
+		{:else}
+			<div class="finished">
+				<p class="finished-title">¡Completado!</p>
+				{#if routineMeta && !logSaved}
+					<button class="btn-save-log" onclick={saveLog} disabled={logBusy}>
+						{logBusy ? 'Guardando…' : 'Guardar entreno'}
+					</button>
+				{:else if logSaved}
+					<p class="log-saved">✓ Guardado en historial</p>
+				{/if}
+				<button class="btn-start" onclick={rebuildAndReset}>Volver a empezar</button>
+			</div>
+		{/if}
+
+		<details class="config-settings" class:disabled={running}>
+			<summary>Configurar</summary>
+			<div class="config-panel">
+				{#each [
+					{ key: 'pauseSec',      label: 'Pausa (s)',            hide: false },
+					{ key: 'rounds',        label: 'Bloques',              hide: !!routineData },
+					{ key: 'roundBreakSec', label: 'Descanso bloques (s)', hide: !!routineData },
+				] as row}
+					{#if !row.hide}
+						<div class="cfg-row">
+							<span class="cfg-label">{row.label}</span>
+							<div class="stepper">
+								<button onclick={() => adjustCfg(row.key as keyof typeof cfg, -1)} disabled={running}>−</button>
+								<span>{cfg[row.key as keyof typeof cfg]}</span>
+								<button onclick={() => adjustCfg(row.key as keyof typeof cfg, 1)} disabled={running}>+</button>
+							</div>
+						</div>
+					{/if}
 				{/each}
-			</select>
-			<button class="btn-test" onclick={() => speak('Ejercicio uno. Diez. Veinte. Treinta.')}>Probar</button>
-		</div>
-	</details>
+				{#if running}<p class="cfg-note">Para cambiar: pausar y hacer reset</p>{/if}
+			</div>
+		</details>
+
+		<details class="voice-settings">
+			<summary>Voz</summary>
+			<div class="voice-panel">
+				<select class="voice-select"
+					value={voices.indexOf(selectedVoice!)}
+					onchange={(e) => selectVoice(parseInt(e.currentTarget.value))}>
+					{#each voices as v, i}
+						<option value={i}>{v.name} ({v.lang})</option>
+					{/each}
+				</select>
+				<button class="btn-test" onclick={() => speak('Ejercicio uno. Diez. Veinte. Treinta.')}>Probar</button>
+			</div>
+		</details>
+	{/if}
 </Shell>
 
 <style>
+	.no-routine {
+		display: flex; flex-direction: column; align-items: center;
+		gap: 20px; padding-top: 80px; text-align: center;
+	}
+	.no-routine-text { color: #555; font-size: 1rem; }
+	.btn-go {
+		padding: 12px 24px; background: #4ade80; color: #0f0f0f;
+		border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 0.95rem;
+	}
+
 	.routine-pill {
 		text-align: center; font-size: 0.78rem; color: #4ade80;
 		background: #0d1f0d; border: 1px solid #1a3a1a; border-radius: 20px;
@@ -512,7 +527,6 @@
 	.btn-reset:active { transform: scale(0.97); }
 	.finished { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding-top: 40px; }
 	.finished-title { font-size: 2.2rem; color: #4ade80; font-weight: 700; }
-	.finished-sub   { color: #666; }
 	.btn-save-log {
 		padding: 14px 28px; font-size: 1rem; font-weight: 700;
 		border: 1px solid #2a4a2a; border-radius: 12px; cursor: pointer;

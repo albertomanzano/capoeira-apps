@@ -32,14 +32,8 @@
 		<a href="/members/rutinas"  class:active={tab === 'rutinas'}>
 			<span class="icon">📋</span><span>Rutinas</span>
 		</a>
-		<a href="/members/entrenar" class:active={tab === 'entrenar'}>
-			<span class="icon">💪</span><span>Entrenar</span>
-		</a>
 		<a href="/members/historial" class:active={tab === 'historial'}>
 			<span class="icon">📊</span><span>Historial</span>
-		</a>
-		<a href="/members/timer" class:active={tab === 'timer'}>
-			<span class="icon">⏱</span><span>Timer</span>
 		</a>
 	</nav>
 </div>

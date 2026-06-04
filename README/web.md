@@ -22,11 +22,10 @@ Sigue las [convenciones](convenciones.md) generales del proyecto.
 /login  /registro  /reset-password
 
 /members/                ← requiere login (auth guard en members/+layout.svelte)
-    /rutinas             — gestión de rutinas
+    /rutinas             — gestión de rutinas; lanza el timer con ▶
     /rutinas/[id]        — editar rutina
-    /entrenar            — anotar entrenamiento
     /historial           — historial de entrenamientos
-    /timer               — timer con voz
+    /timer               — timer con voz (solo accesible desde ▶ en rutinas)
     /descargas           — descargar app de luthería
     /alumnos             — solo profe (gestión de alumnos)
     /alumnos/[id]
@@ -34,8 +33,10 @@ Sigue las [convenciones](convenciones.md) generales del proyecto.
 ```
 
 **Navegación por rol**:
-- Profe: Alumnos (topbar) + Rutinas / Entrenar / Historial / Timer (tabbar) + ⬇ Descargas + ⚙ Perfil
-- Alumno: Rutinas / Entrenar / Historial / Timer (tabbar) + ⬇ Descargas + ⚙ Perfil
+- Profe: Alumnos (topbar) + Rutinas / Historial (tabbar) + ⬇ Descargas + ⚙ Perfil
+- Alumno: Rutinas / Historial (tabbar) + ⬇ Descargas + ⚙ Perfil
+
+**Flujo de entrenamiento**: Rutinas → ▶ lanza timer → reps se anotan durante el entreno → "Guardar entreno" al terminar → Historial.
 
 ## Modelo de datos — rutinas
 
@@ -63,15 +64,13 @@ Un ejercicio llamado "Descanso" (insensible a mayúsculas) se trata como pausa e
 
 - **Auth**: login, registro, reset-password, logout, cambio de contraseña
 - **Rutinas**: crear/editar/borrar/copiar. Al guardar (nueva o editada), la fecha actual se añade automáticamente al nombre (`DD/MM/YYYY`). Editar = borrar fila antigua + insertar nueva (inmutable). El formulario de edición muestra el nombre sin la fecha. Bloques con ejercicios. Vista colapsable con resumen (bloques · ejercicios · duración total). Copiar bloque. Botón ▶ por bloque (lanza timer con ese bloque) y ▶ en la tarjeta (lanza timer con la rutina completa).
-- **Entrenar**: seleccionar rutina → ejercicios por bloque → anotar marca → guardar con fecha. No muestra "Descanso".
+- **Timer**: lanzado siempre desde ▶ en Rutinas — sin acceso directo desde nav.
+  - **Bloque**: usa los ejercicios del bloque; config disponible: pausa, bloques (repeticiones), descanso entre bloques.
+  - **Rutina completa**: encadena todos los bloques en secuencia, se ejecuta una sola vez (ROUNDS=1). Config disponible: solo pausa. Barra de puntos por bloque.
+  - Durante cada ejercicio (y la pausa siguiente) aparece un input para anotar reps.
+  - Al terminar: botón "Guardar entreno" → guarda en `training_logs`. Sin rutina cargada: pantalla "Ve a Rutinas".
+  - Voz (Web Speech API) + beeps: ejercicios cada 5s; pausas cuenta atrás 10→4; beeps en 3, 2, 1.
 - **Historial**: cards desplegables con bloques, marcas y duración total. No muestra "Descanso".
-- **Timer**: dos modos:
-  - **Manual**: configura número de ejercicios, duración, pausa, rondas y descanso entre rondas
-  - **Bloque**: lanzado desde ▶ de un bloque — usa los ejercicios del bloque, ignora config de ejercicios/duración
-  - **Rutina completa**: lanzado desde ▶ de la tarjeta de rutina — encadena todos los bloques. La barra de puntos muestra una fila por bloque con el nombre a la izquierda. El header muestra el nombre del bloque activo.
-  - Voz (Web Speech API) + beeps:
-    - **Ejercicios**: voz cada 5s de tiempo transcurrido; beeps en 3, 2, 1
-    - **Pausas**: voz cuenta atrás 10→4; beeps en 3, 2, 1
 - **Alumnos**: el profe gestiona la lista (añadir/borrar)
 - **Descargas**: APK de luthería (requiere login)
 
