@@ -52,7 +52,7 @@
 	let running       = $state(false);
 	let finished      = $state(false);
 	let inRoundBreak  = $state(false);
-	let started       = false;
+	let started       = $state(false);
 
 	let voices        = $state<SpeechSynthesisVoice[]>([]);
 	let selectedVoice = $state<SpeechSynthesisVoice | null>(null);

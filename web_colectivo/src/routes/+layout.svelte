@@ -1,20 +1,8 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
-	import { user, role, loading } from '$lib/stores/auth';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { loading } from '$lib/stores/auth';
 
 	let { children } = $props();
-
-	$effect(() => {
-		if ($loading) return;
-		const path = $page.url.pathname;
-		const publicPaths = ['/login', '/registro', '/reset-password', '/descargas'];
-		if (!$user && !publicPaths.includes(path)) { goto('/login'); return; }
-		if ($user && $role !== 'profe' && (path === '/alumnos' || path.startsWith('/alumnos/'))) {
-			goto('/rutinas');
-		}
-	});
 </script>
 
 <svelte:head>

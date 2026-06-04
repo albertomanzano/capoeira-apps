@@ -16,9 +16,10 @@
 		<span class="brand">Capoeira</span>
 		<div class="topbar-right">
 			{#if $role === 'profe'}
-				<a href="/alumnos" class="top-link" class:active={tab === 'alumnos'}>Alumnos</a>
+				<a href="/members/alumnos" class="top-link" class:active={tab === 'alumnos'}>Alumnos</a>
 			{/if}
-			<a href="/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Perfil">⚙</a>
+			<a href="/members/descargas" class="top-link" class:active={tab === 'descargas'}>⬇</a>
+			<a href="/members/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Perfil">⚙</a>
 			<button class="logout" onclick={logout}>Salir</button>
 		</div>
 	</div>
@@ -28,16 +29,16 @@
 	</div>
 
 	<nav class="tabbar">
-		<a href="/rutinas"  class:active={tab === 'rutinas'}>
+		<a href="/members/rutinas"  class:active={tab === 'rutinas'}>
 			<span class="icon">📋</span><span>Rutinas</span>
 		</a>
-		<a href="/entrenar" class:active={tab === 'entrenar'}>
+		<a href="/members/entrenar" class:active={tab === 'entrenar'}>
 			<span class="icon">💪</span><span>Entrenar</span>
 		</a>
-		<a href="/historial" class:active={tab === 'historial'}>
+		<a href="/members/historial" class:active={tab === 'historial'}>
 			<span class="icon">📊</span><span>Historial</span>
 		</a>
-		<a href="/timer" class:active={tab === 'timer'}>
+		<a href="/members/timer" class:active={tab === 'timer'}>
 			<span class="icon">⏱</span><span>Timer</span>
 		</a>
 	</nav>

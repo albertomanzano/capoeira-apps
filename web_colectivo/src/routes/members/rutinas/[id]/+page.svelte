@@ -79,7 +79,7 @@
 		const { error: dbErr } = await supabase
 			.from('routines').update({ name: name.trim(), exercises: filtered }).eq('id', id);
 		if (dbErr) { error = dbErr.message; busy = false; return; }
-		goto('/rutinas');
+		goto('/members/rutinas');
 	}
 
 	$effect(() => { if (id) load(); });

@@ -19,7 +19,7 @@
 				.insert({ id: data.user.id, name: name.trim(), role: 'alumno' });
 			if (profileErr) { error = profileErr.message; busy = false; return; }
 		}
-		goto('/mi-perfil');
+		goto('/members/mi-perfil');
 	}
 </script>
 

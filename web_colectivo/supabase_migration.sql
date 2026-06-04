@@ -9,9 +9,10 @@ CREATE TABLE IF NOT EXISTS routines (
 
 ALTER TABLE routines ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "own_all" ON routines;
 CREATE POLICY "own_all" ON routines
   FOR ALL TO authenticated
-  USING  (user_id = auth.uid() OR is_profe())
+  USING  (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
 
 -- Tabla de registros de entrenamiento
@@ -28,7 +29,8 @@ CREATE TABLE IF NOT EXISTS training_logs (
 
 ALTER TABLE training_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "own_all" ON training_logs;
 CREATE POLICY "own_all" ON training_logs
   FOR ALL TO authenticated
-  USING  (user_id = auth.uid() OR is_profe())
+  USING  (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());

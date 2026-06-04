@@ -74,7 +74,7 @@
 			<p class="saved-icon">✓</p>
 			<p class="saved-title">¡Guardado!</p>
 			<button class="btn-primary" onclick={reset}>Otro entreno</button>
-			<button class="btn-secondary" onclick={() => goto('/historial')}>Ver historial</button>
+			<button class="btn-secondary" onclick={() => goto('/members/historial')}>Ver historial</button>
 		</div>
 
 	{:else if selected}
@@ -110,7 +110,7 @@
 	{:else}
 		<div class="header"><h1>Entrenar</h1></div>
 		{#if routines.length === 0}
-			<p class="hint">Sin rutinas. <a href="/rutinas">Crea una primero.</a></p>
+			<p class="hint">Sin rutinas. <a href="/members/rutinas">Crea una primero.</a></p>
 		{:else}
 			<p class="section-label">Elige una rutina</p>
 			{#each routines as r}

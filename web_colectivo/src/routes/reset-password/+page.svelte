@@ -24,7 +24,7 @@
 		busy = true; error = '';
 		const { error: err } = await supabase.auth.updateUser({ password: newPassword });
 		if (err) { error = err.message; busy = false; return; }
-		goto('/mi-perfil');
+		goto('/members/mi-perfil');
 	}
 </script>
 

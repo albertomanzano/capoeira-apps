@@ -4,6 +4,6 @@
 
 	$effect(() => {
 		if ($loading) return;
-		goto($user ? ($role === 'profe' ? '/alumnos' : '/rutinas') : '/descargas');
+		goto($user ? ($role === 'profe' ? '/members/alumnos' : '/members/rutinas') : '/login');
 	});
 </script>

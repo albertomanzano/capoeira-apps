@@ -11,7 +11,7 @@
 	let forgotMode = $state(false);
 
 	$effect(() => {
-		if ($user && $role !== null) goto($role === 'alumno' ? '/mi-perfil' : '/sesiones');
+		if ($user && $role !== null) goto($role === 'profe' ? '/members/alumnos' : '/members/rutinas');
 	});
 
 	async function login() {

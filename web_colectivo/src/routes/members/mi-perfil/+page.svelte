@@ -48,7 +48,7 @@
 	{#if pwSuccess}<p class="pw-ok">Contraseña actualizada</p>{/if}
 
 	<div class="sep"></div>
-	<button class="btn-secondary" onclick={() => goto('/rutinas')}>Mis rutinas</button>
+	<button class="btn-secondary" onclick={() => goto('/members/rutinas')}>Mis rutinas</button>
 </Shell>
 
 <style>

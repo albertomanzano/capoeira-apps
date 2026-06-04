@@ -36,7 +36,7 @@
 
 	{#each students as s}
 		<div class="list-item">
-			<button class="item-btn" onclick={() => goto(`/alumnos/${s.id}`)}>
+			<button class="item-btn" onclick={() => goto(`/members/alumnos/${s.id}`)}>
 				<span class="item-title">{s.name}</span>
 				<span class="chevron">›</span>
 			</button>

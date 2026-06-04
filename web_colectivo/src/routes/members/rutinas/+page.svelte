@@ -31,6 +31,14 @@
 
 	let loadError = $state('');
 
+	function normalize(r: any): Routine {
+		const exs = r.exercises ?? [];
+		if (exs.length > 0 && exs[0].duration_s !== undefined && !exs[0].exercises) {
+			return { ...r, exercises: [{ name: '', exercises: exs }] };
+		}
+		return r as Routine;
+	}
+
 	async function load() {
 		const { data, error: loadErr } = await supabase
 			.from('routines')
@@ -38,7 +46,7 @@
 			.order('created_at', { ascending: false });
 		if (loadErr) { loadError = loadErr.message; return; }
 		loadError = '';
-		routines = (data ?? []) as Routine[];
+		routines = (data ?? []).map(normalize) as Routine[];
 	}
 
 	function toggle(id: string) {
@@ -134,7 +142,7 @@
 
 	function launchTimer(bloque: Bloque) {
 		localStorage.setItem('capoeira_timer_bloque', JSON.stringify(cloneBloque(bloque)));
-		goto('/timer');
+		goto('/members/timer');
 	}
 
 	$effect(() => { load(); });
@@ -214,7 +222,7 @@
 			</button>
 			<div class="routine-actions">
 				<button class="btn-icon" onclick={() => copyRoutine(r)} title="Copiar rutina">⎘</button>
-				<button class="btn-icon" onclick={() => goto(`/rutinas/${r.id}`)}>✎</button>
+				<button class="btn-icon" onclick={() => goto(`/members/rutinas/${r.id}`)}>✎</button>
 				<button class="btn-icon danger" onclick={() => remove(r.id, r.name)}>✕</button>
 			</div>
 		</div>
