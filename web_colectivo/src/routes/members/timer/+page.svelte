@@ -337,18 +337,8 @@
 		{#if !finished}
 			<div class="timer-wrap">
 				{#if inRoundBreak}
-					<p class="round-info">Descanso entre bloques</p>
-					<p class="phase-label round-break">Bloque {round + 1} → {round + 2}</p>
-					<p class="phase-name"></p>
+					<p class="phase-name">Descanso</p>
 				{:else}
-					<p class="round-info">
-						{#if routineData && PHASES[phase]?.bloque}
-							{PHASES[phase].bloque}
-						{:else}
-							Bloque {round + 1} de {ROUNDS}
-						{/if}
-					</p>
-					<p class="phase-label {isPausa ? 'pausa' : ''}">{isPausa ? 'Pausa' : 'Ejercicio'}</p>
 					<p class="phase-name">{isPausa ? '' : PHASES[phase].name}</p>
 				{/if}
 
@@ -362,17 +352,14 @@
 				</div>
 
 				{#if showMarkInput}
-					<div class="mark-row">
-						<span class="mark-ex-name">{lastExName}</span>
-						<input
-							type="number"
-							inputmode="numeric"
-							placeholder="reps"
-							value={marks[currentExIdx] ?? ''}
-							oninput={(e) => { marks[currentExIdx] = e.currentTarget.value ? Number(e.currentTarget.value) : null; }}
-							class="mark-input-timer"
-						/>
-					</div>
+					<input
+						type="number"
+						inputmode="numeric"
+						placeholder="—"
+						value={marks[currentExIdx] ?? ''}
+						oninput={(e) => { marks[currentExIdx] = e.currentTarget.value ? Number(e.currentTarget.value) : null; }}
+						class="mark-input-timer"
+					/>
 				{/if}
 
 				{#if routineData}
@@ -420,29 +407,6 @@
 			</div>
 		{/if}
 
-		<details class="config-settings" class:disabled={running}>
-			<summary>Configurar</summary>
-			<div class="config-panel">
-				{#each [
-					{ key: 'pauseSec',      label: 'Pausa (s)',            hide: false },
-					{ key: 'rounds',        label: 'Bloques',              hide: !!routineData },
-					{ key: 'roundBreakSec', label: 'Descanso bloques (s)', hide: !!routineData },
-				] as row}
-					{#if !row.hide}
-						<div class="cfg-row">
-							<span class="cfg-label">{row.label}</span>
-							<div class="stepper">
-								<button onclick={() => adjustCfg(row.key as keyof typeof cfg, -1)} disabled={running}>−</button>
-								<span>{cfg[row.key as keyof typeof cfg]}</span>
-								<button onclick={() => adjustCfg(row.key as keyof typeof cfg, 1)} disabled={running}>+</button>
-							</div>
-						</div>
-					{/if}
-				{/each}
-				{#if running}<p class="cfg-note">Para cambiar: pausar y hacer reset</p>{/if}
-			</div>
-		</details>
-
 		<details class="voice-settings">
 			<summary>Voz</summary>
 			<div class="voice-panel">
@@ -479,10 +443,6 @@
 		display: flex; flex-direction: column; align-items: center;
 		padding-top: 12px; text-align: center;
 	}
-	.round-info   { font-size: 0.95rem; color: #555; letter-spacing: 1px; margin-bottom: 4px; }
-	.phase-label  { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: #888; margin-bottom: 4px; }
-	.phase-label.pausa       { color: #4ecdc4; }
-	.phase-label.round-break { color: #f59e0b; }
 	.phase-name   { font-size: 1.8rem; font-weight: 700; min-height: 2.2rem; margin-bottom: 20px; }
 	.timer { font-size: 7rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 10px; }
 	.timer.pausa       { color: #4ecdc4; }
@@ -494,19 +454,15 @@
 	.bar.round-break { background: #f59e0b; }
 	.bar.warning     { background: #ff6b35; }
 
-	.mark-row {
-		display: flex; align-items: center; justify-content: space-between;
-		gap: 12px; margin-bottom: 16px;
-		background: #1a1a1a; border-radius: 10px; padding: 10px 16px;
-		width: 100%; max-width: 340px;
-	}
-	.mark-ex-name { font-size: 0.85rem; color: #888; flex: 1; text-align: left; }
 	.mark-input-timer {
-		width: 80px; flex: none; text-align: center;
-		font-size: 1.3rem; font-weight: 700;
-		padding: 8px; border-radius: 8px;
-		background: #0f0f0f; border: 1px solid #333; color: #fff;
+		width: 120px; text-align: center; margin-bottom: 16px;
+		font-size: 2rem; font-weight: 700;
+		padding: 10px; border-radius: 10px;
+		background: #1a1a1a; border: 1px solid #333; color: #fff;
+		-moz-appearance: textfield;
 	}
+	.mark-input-timer::-webkit-outer-spin-button,
+	.mark-input-timer::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 	.dots-rutina { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; width: 100%; }
 	.dots-row { display: flex; align-items: center; gap: 8px; }
@@ -536,8 +492,8 @@
 	.btn-save-log:disabled { opacity: 0.5; cursor: default; }
 	.log-saved { color: #4ade80; font-size: 0.9rem; }
 
-	.config-settings, .voice-settings { margin-top: 24px; font-size: 0.85rem; color: #444; }
-	.config-settings summary, .voice-settings summary { cursor: pointer; user-select: none; }
+	.voice-settings { margin-top: 24px; font-size: 0.85rem; color: #444; }
+	.voice-settings summary { cursor: pointer; user-select: none; }
 	.config-panel, .voice-panel {
 		display: flex; flex-direction: column; gap: 8px;
 		margin-top: 8px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px 12px;
