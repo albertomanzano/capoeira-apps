@@ -82,14 +82,14 @@
 		font-size: 2rem;
 		font-weight: 800;
 		text-align: center;
-		color: #4ade80;
+		color: var(--accent);
 	}
 	form { display: flex; flex-direction: column; gap: 16px; }
 	.field { display: flex; flex-direction: column; gap: 6px; }
 	label { font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
 	.error { color: #ef4444; font-size: 0.85rem; text-align: center; }
 	.register-link { text-align: center; font-size: 0.85rem; color: #444; }
-	.register-link a { color: #4ade80; text-decoration: none; }
-	.link-btn { background: none; border: none; color: #4ade80; cursor: pointer; font-size: 0.85rem; padding: 0; }
-	.info { color: #4ade80; font-size: 0.85rem; text-align: center; }
+	.register-link a { color: var(--accent); text-decoration: none; }
+	.link-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.85rem; padding: 0; }
+	.info { color: var(--accent); font-size: 0.85rem; text-align: center; }
 </style>

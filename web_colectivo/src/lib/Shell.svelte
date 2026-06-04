@@ -1,10 +1,11 @@
 <script lang="ts">
+	import logo from '$lib/assets/logo.svg';
 	let { tab, children } = $props<{ tab: string; children: any }>();
 </script>
 
 <div class="shell">
 	<div class="topbar">
-		<span class="brand">Capoeira</span>
+		<img src={logo} alt="Capoeira Colectiva" class="logo" />
 		<div class="topbar-right">
 			<a href="/members/descargas" class="top-link" class:active={tab === 'descargas'}>⬇</a>
 			<a href="/members/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Ajustes">⚙</a>
@@ -37,16 +38,16 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 14px 16px;
-		border-bottom: 1px solid #1a1a1a;
+		padding: 8px 16px;
+		border-bottom: 1px solid var(--border);
 	}
-	.brand { font-weight: 700; font-size: 1rem; color: #4ade80; letter-spacing: 1px; text-transform: uppercase; }
+	.logo { height: 100px; width: auto; }
 	.topbar-right { display: flex; align-items: center; gap: 14px; }
 	.top-link {
 		color: #444; font-size: 0.85rem; text-decoration: none;
 		transition: color 0.15s;
 	}
-	.top-link.active { color: #4ade80; }
+	.top-link.active { color: var(--accent); }
 	.top-link:hover  { color: #888; }
 	.content {
 		flex: 1;
@@ -62,8 +63,8 @@
 		width: 100%;
 		max-width: 480px;
 		display: flex;
-		background: #0a0a0a;
-		border-top: 1px solid #1e1e1e;
+		background: var(--bg);
+		border-top: 1px solid var(--border);
 		z-index: 100;
 		padding-bottom: env(safe-area-inset-bottom, 0px);
 	}
@@ -82,6 +83,6 @@
 		letter-spacing: 0.5px;
 		transition: color 0.15s;
 	}
-	.tabbar a.active { color: #4ade80; }
+	.tabbar a.active { color: var(--accent); }
 	.icon { font-size: 1.3rem; line-height: 1; }
 </style>

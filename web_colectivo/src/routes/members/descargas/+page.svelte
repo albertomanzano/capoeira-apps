@@ -30,13 +30,13 @@
 	.cards { display: flex; flex-direction: column; gap: 16px; }
 
 	.card {
-		background: #1a1a1a;
+		background: var(--surface);
 		border-radius: 16px;
 		padding: 24px;
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
-		border: 1px solid #222;
+		border: 1px solid var(--border);
 	}
 	.card-icon { font-size: 2rem; }
 	.card-body h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
@@ -45,7 +45,7 @@
 
 	.btn-download {
 		display: block; text-align: center;
-		padding: 14px; background: #4ade80; color: #0f0f0f;
+		padding: 14px; background: var(--accent); color: var(--accent-on);
 		font-weight: 700; font-size: 1rem; border-radius: 12px; text-decoration: none;
 	}
 	.btn-download:hover { background: #86efac; }

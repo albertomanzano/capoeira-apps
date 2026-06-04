@@ -137,17 +137,17 @@
 		background: none; border: none; color: #555; cursor: pointer;
 		font-size: 0.85rem; padding: 0; flex: none;
 	}
-	.btn-back:hover { color: #ccc; }
+	.btn-back:hover { color: var(--text); }
 	h1 { font-size: 1.2rem; font-weight: 700; }
 
 	.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
 	.label { font-size: 0.72rem; color: #555; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
 	.date-input {
-		background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px;
-		color: #ccc; font-size: 0.95rem; padding: 10px 12px;
+		background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+		color: var(--text); font-size: 0.95rem; padding: 10px 12px;
 		width: 100%; box-sizing: border-box;
 	}
-	.date-input:focus { border-color: #4ade80; outline: none; }
+	.date-input:focus { border-color: var(--accent); outline: none; }
 
 	.section-label {
 		font-size: 0.72rem; color: #555; text-transform: uppercase;
@@ -155,8 +155,8 @@
 	}
 	.routine-list { display: flex; flex-direction: column; gap: 6px; }
 	.routine-item {
-		background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px;
-		color: #ccc; text-align: left; padding: 14px 16px; cursor: pointer;
+		background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+		color: var(--text); text-align: left; padding: 14px 16px; cursor: pointer;
 		font-size: 0.9rem; transition: background 0.15s;
 	}
 	.routine-item:hover { background: #222; border-color: #3a3a3a; }
@@ -165,12 +165,12 @@
 		display: flex; align-items: center; justify-content: space-between;
 		margin-bottom: 20px;
 	}
-	.selected-name { font-size: 0.95rem; font-weight: 700; color: #ccc; }
+	.selected-name { font-size: 0.95rem; font-weight: 700; color: var(--text); }
 	.btn-change {
 		background: none; border: none; color: #555; cursor: pointer;
 		font-size: 0.8rem; padding: 0;
 	}
-	.btn-change:hover { color: #ccc; }
+	.btn-change:hover { color: var(--text); }
 
 	.bloques { display: flex; flex-direction: column; gap: 20px; margin-bottom: 28px; }
 	.bloque { display: flex; flex-direction: column; gap: 6px; }
@@ -183,17 +183,17 @@
 	.ex-dur  { color: #444; font-size: 0.78rem; width: 40px; text-align: right; }
 	.mark-edit {
 		width: 60px; text-align: center; font-size: 1rem; font-weight: 700;
-		padding: 6px 8px; border-radius: 6px; color: #4ade80;
-		background: #0f0f0f; border: 1px solid #2a2a2a;
+		padding: 6px 8px; border-radius: 6px; color: var(--accent);
+		background: var(--bg); border: 1px solid var(--border);
 		-moz-appearance: textfield;
 	}
 	.mark-edit::-webkit-outer-spin-button,
 	.mark-edit::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-	.mark-edit:focus { border-color: #4ade80; outline: none; }
+	.mark-edit:focus { border-color: var(--accent); outline: none; }
 
 	.btn-save {
 		width: 100%; padding: 14px; border-radius: 10px;
-		background: #4ade80; color: #000; border: none;
+		background: var(--accent); color: var(--accent-on); border: none;
 		font-size: 1rem; font-weight: 700; cursor: pointer;
 		transition: opacity 0.15s;
 	}

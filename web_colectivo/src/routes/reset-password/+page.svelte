@@ -53,7 +53,7 @@
 		padding: 80px 24px 24px;
 		display: flex; flex-direction: column; gap: 24px;
 	}
-	h1 { font-size: 2rem; font-weight: 800; text-align: center; color: #4ade80; }
+	h1 { font-size: 2rem; font-weight: 800; text-align: center; color: var(--accent); }
 	.subtitle { text-align: center; color: #555; font-size: 0.9rem; margin-top: -16px; }
 	form { display: flex; flex-direction: column; gap: 16px; }
 	.field { display: flex; flex-direction: column; gap: 6px; }

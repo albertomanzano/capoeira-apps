@@ -108,12 +108,12 @@
 	.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 	h1 { font-size: 1.4rem; font-weight: 700; }
 	.btn-add {
-		background: #4ade80; color: #000; border: none; border-radius: 8px;
+		background: var(--accent); color: var(--accent-on); border: none; border-radius: 8px;
 		padding: 8px 14px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
 	}
 
 	.group-card {
-		background: #1a1a1a; border-radius: 10px;
+		background: var(--surface); border-radius: 10px;
 		margin-bottom: 8px; overflow: hidden;
 	}
 	.group-header {
@@ -121,23 +121,23 @@
 		padding: 14px 16px; cursor: pointer;
 		transition: background 0.15s;
 	}
-	.group-header:hover { background: #1e1e1e; }
+	.group-header:hover { background: var(--surface-hover); }
 	.chevron { font-size: 0.75rem; color: #555; flex: none; }
 	.group-meta { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 	.group-name {
-		font-size: 0.95rem; font-weight: 700; color: #ccc;
+		font-size: 0.95rem; font-weight: 700; color: var(--text);
 		overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 	}
 	.group-sub { font-size: 0.72rem; color: #555; }
 
-	.group-entries { border-top: 1px solid #222; }
+	.group-entries { border-top: 1px solid var(--border); }
 	.entry-row {
 		display: flex; align-items: center; gap: 10px;
 		padding: 11px 16px 11px 28px; cursor: pointer;
-		border-bottom: 1px solid #1e1e1e; transition: background 0.15s;
+		border-bottom: 1px solid var(--border); transition: background 0.15s;
 	}
 	.entry-row:last-child { border-bottom: none; }
-	.entry-row:hover { background: #1e1e1e; }
+	.entry-row:hover { background: var(--surface-hover); }
 	.log-date { font-size: 0.85rem; font-weight: 700; color: #888; flex: none; }
 	.log-summary { font-size: 0.72rem; color: #444; flex: 1; }
 	.btn-del {

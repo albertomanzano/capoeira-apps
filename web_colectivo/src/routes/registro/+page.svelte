@@ -56,12 +56,12 @@
 		padding: 80px 24px 24px;
 		display: flex; flex-direction: column; gap: 24px;
 	}
-	h1 { font-size: 2rem; font-weight: 800; text-align: center; color: #4ade80; }
+	h1 { font-size: 2rem; font-weight: 800; text-align: center; color: var(--accent); }
 	.subtitle { text-align: center; color: #555; font-size: 0.9rem; margin-top: -16px; }
 	form { display: flex; flex-direction: column; gap: 16px; }
 	.field { display: flex; flex-direction: column; gap: 6px; }
 	label { font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
 	.error { color: #ef4444; font-size: 0.85rem; text-align: center; }
 	.login-link { text-align: center; font-size: 0.85rem; color: #444; }
-	.login-link a { color: #4ade80; text-decoration: none; }
+	.login-link a { color: var(--accent); text-decoration: none; }
 </style>

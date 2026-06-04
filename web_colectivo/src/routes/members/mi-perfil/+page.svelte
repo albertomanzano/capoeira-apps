@@ -117,16 +117,16 @@
 		letter-spacing: 1px; margin-bottom: 10px;
 	}
 	.card {
-		background: #1a1a1a; border-radius: 10px;
+		background: var(--surface); border-radius: 10px;
 		padding: 14px 16px; margin-bottom: 8px;
 		display: flex; align-items: center; gap: 10px;
 	}
 	.voice-select {
-		flex: 1; background: #0f0f0f; color: #ccc; border: 1px solid #2a2a2a;
+		flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);
 		border-radius: 8px; padding: 8px 10px; font-size: 0.85rem;
 	}
 	.btn-test {
-		padding: 8px 14px; font-size: 0.85rem; background: #2a2a2a;
+		padding: 8px 14px; font-size: 0.85rem; background: var(--surface-hover);
 		color: #aaa; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap;
 	}
 	.hint-small { color: #444; font-size: 0.85rem; }
@@ -135,15 +135,15 @@
 	.pw-row { display: flex; gap: 8px; margin-bottom: 8px; }
 	.pw-row input { flex: 1; }
 	.pw-btn {
-		padding: 0 16px; background: #1a1a1a; border: 1px solid #2a2a2a;
+		padding: 0 16px; background: var(--surface); border: 1px solid var(--border);
 		color: #888; border-radius: 8px; cursor: pointer; font-size: 0.9rem; white-space: nowrap;
 	}
 	.pw-error { color: #ef4444; font-size: 0.8rem; margin-top: 4px; }
-	.pw-ok    { color: #4ade80; font-size: 0.8rem; margin-top: 4px; }
+	.pw-ok    { color: var(--accent); font-size: 0.8rem; margin-top: 4px; }
 
-	.sep { height: 1px; background: #1a1a1a; margin: 24px 0; }
+	.sep { height: 1px; background: var(--surface); margin: 24px 0; }
 	.btn-logout {
-		width: 100%; padding: 12px; background: none; border: 1px solid #2a2a2a;
+		width: 100%; padding: 12px; background: none; border: 1px solid var(--border);
 		color: #555; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
 	}
 	.btn-logout:hover { color: #ef4444; border-color: #ef4444; }

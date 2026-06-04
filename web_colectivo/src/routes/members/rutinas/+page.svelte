@@ -237,38 +237,40 @@
 	{#if loadError}<p class="load-error">Error al cargar: {loadError}</p>{/if}
 
 	{#each routines as r}
-		<div class="routine-card" class:open={expanded.has(r.id)}>
-			<button class="routine-summary" onclick={() => toggle(r.id)}>
-				<span class="chevron">{expanded.has(r.id) ? '▾' : '▸'}</span>
-				<span class="routine-name">{r.name}</span>
-				<span class="routine-meta">
-					{r.exercises.length} bl · {totalExs(r.exercises)} ej · {totalDuration(r.exercises)}
-				</span>
-			</button>
-			<div class="routine-actions">
-				<button class="btn-play" onclick={(e) => { e.stopPropagation(); launchTimerRutina(r); }} title="Timer rutina completa">▶</button>
-				<button class="btn-icon" onclick={() => copyRoutine(r)} title="Copiar rutina">⎘</button>
+		<div class="routine-wrap">
+			<div class="routine-header">
+				<button class="routine-summary" onclick={() => toggle(r.id)}>
+					<span class="chevron">{expanded.has(r.id) ? '▾' : '▸'}</span>
+					<span class="routine-name">{r.name}</span>
+					<span class="routine-meta">
+						{r.exercises.length} bl · {totalExs(r.exercises)} ej · {totalDuration(r.exercises)}
+					</span>
+				</button>
+				<div class="routine-actions">
+					<button class="btn-play" onclick={(e) => { e.stopPropagation(); launchTimerRutina(r); }} title="Timer rutina completa">▶</button>
+					<button class="btn-icon" onclick={() => copyRoutine(r)} title="Copiar rutina">⎘</button>
 					<button class="btn-icon danger" onclick={() => remove(r.id, r.name)}>✕</button>
+				</div>
 			</div>
+			{#if expanded.has(r.id)}
+				<div class="bloques-list">
+					{#each r.exercises as bloque, bi}
+						<div class="bloque-item">
+							<div class="bloque-header">
+								<span class="bloque-title">{bloque.name || `Bloque ${bi + 1}`}</span>
+								<span class="bloque-count">{bloque.exercises.filter(e => !isDescanso(e.name)).length} ej</span>
+								<button class="btn-play" onclick={() => launchTimer(bloque, r.id, r.name)}>▶</button>
+							</div>
+							<div class="ex-pills">
+								{#each bloque.exercises.filter(e => !isDescanso(e.name)) as ex}
+									<span class="pill">{ex.name}<span class="pill-dur"> {fmt(ex.duration_s)}</span></span>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
 		</div>
-		{#if expanded.has(r.id)}
-			<div class="bloques-list">
-				{#each r.exercises as bloque, bi}
-					<div class="bloque-item">
-						<div class="bloque-header">
-							<span class="bloque-title">{bloque.name || `Bloque ${bi + 1}`}</span>
-							<span class="bloque-count">{bloque.exercises.filter(e => !isDescanso(e.name)).length} ej</span>
-							<button class="btn-play" onclick={() => launchTimer(bloque, r.id, r.name)}>▶</button>
-						</div>
-						<div class="ex-pills">
-							{#each bloque.exercises.filter(e => !isDescanso(e.name)) as ex}
-								<span class="pill">{ex.name}<span class="pill-dur"> {fmt(ex.duration_s)}</span></span>
-							{/each}
-						</div>
-					</div>
-				{/each}
-			</div>
-		{/if}
 	{/each}
 
 	{#if routines.length === 0 && !creating}
@@ -280,17 +282,17 @@
 	.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 	h1 { font-size: 1.4rem; font-weight: 700; }
 	.btn-add {
-		padding: 8px 16px; background: #4ade80; color: #0f0f0f;
+		padding: 8px 16px; background: var(--accent); color: var(--accent-on);
 		border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer;
 	}
 
 	/* form */
 	.form-card {
-		background: #141414; border: 1px solid #2a2a2a; border-radius: 12px;
+		background: var(--surface-hover); border: 1px solid var(--border); border-radius: 12px;
 		padding: 16px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px;
 	}
 	.bloque-form {
-		background: #1a1a1a; border-radius: 8px; padding: 10px 12px;
+		background: var(--surface); border-radius: 8px; padding: 10px 12px;
 		display: flex; flex-direction: column; gap: 8px;
 	}
 	.bloque-form-header {
@@ -302,7 +304,7 @@
 		background: none; border: none; color: #555; cursor: pointer;
 		font-size: 1rem; padding: 4px 6px; border-radius: 4px; flex: none;
 	}
-	.btn-icon:hover { color: #ccc; background: #2a2a2a; }
+	.btn-icon:hover { color: var(--text); background: var(--surface-hover); }
 	.btn-icon.danger:hover { color: #ef4444; background: none; }
 
 	.ex-row { display: flex; align-items: center; gap: 8px; }
@@ -317,40 +319,40 @@
 	.error { color: #ef4444; font-size: 0.82rem; }
 
 	/* list */
-	.routine-card {
-		display: flex; align-items: center;
-		background: #1a1a1a; border-radius: 10px; margin-bottom: 4px; overflow: hidden;
+	.routine-wrap {
+		background: var(--surface); border-radius: 10px; margin-bottom: 8px; overflow: hidden;
 	}
-	.routine-card.open { border-radius: 10px 10px 0 0; margin-bottom: 0; }
+	.routine-header { display: flex; align-items: center; }
 	.routine-summary {
 		flex: 1; display: flex; align-items: center; gap: 10px;
-		padding: 14px 16px; background: none; border: none; color: #fff; cursor: pointer; text-align: left;
-		min-width: 0;
+		padding: 14px 16px; background: none; border: none; color: var(--text); cursor: pointer; text-align: left;
+		min-width: 0; transition: background 0.15s;
 	}
+	.routine-summary:hover { background: var(--surface-hover); }
 	.chevron { font-size: 0.75rem; color: #555; flex: none; }
 	.routine-name { font-size: 1rem; font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.routine-meta { font-size: 0.72rem; color: #555; flex: none; white-space: nowrap; }
 	.routine-actions { display: flex; align-items: center; padding-right: 8px; gap: 2px; }
 
 	.bloques-list {
-		background: #141414; border-radius: 0 0 10px 10px;
-		padding: 8px 12px 12px; margin-bottom: 10px;
+		border-top: 1px solid var(--border);
+		padding: 8px 12px 12px;
 		display: flex; flex-direction: column; gap: 10px;
 	}
 	.bloque-item { display: flex; flex-direction: column; gap: 6px; }
 	.bloque-header { display: flex; align-items: center; gap: 8px; }
-	.bloque-title { font-size: 0.85rem; font-weight: 700; color: #ccc; flex: 1; }
+	.bloque-title { font-size: 0.85rem; font-weight: 700; color: var(--text); flex: 1; }
 	.bloque-count { font-size: 0.72rem; color: #444; }
 	.btn-play {
-		background: none; border: 1px solid #2a4a2a; color: #4ade80; cursor: pointer;
+		background: none; border: 1px solid var(--border); color: var(--accent); cursor: pointer;
 		font-size: 0.78rem; padding: 3px 8px; border-radius: 6px; flex: none;
 	}
-	.btn-play:hover { background: #1a2e1a; }
+	.btn-play:hover { background: var(--surface-hover); }
 
 	.ex-pills { display: flex; flex-wrap: wrap; gap: 5px; padding-left: 2px; }
 	.pill {
-		font-size: 0.75rem; background: #1e1e1e; border-radius: 6px;
-		padding: 3px 8px; color: #888; border: 1px solid #2a2a2a;
+		font-size: 0.75rem; background: var(--surface-hover); border-radius: 6px;
+		padding: 3px 8px; color: #888; border: 1px solid var(--border);
 	}
 	.pill-dur { color: #444; }
 
@@ -358,13 +360,13 @@
 	.hint { color: #333; text-align: center; padding: 40px 0; font-size: 0.9rem; }
 
 	.btn-primary {
-		padding: 12px 16px; background: #4ade80; color: #0f0f0f;
+		padding: 12px 16px; background: var(--accent); color: var(--accent-on);
 		border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
 	}
 	.btn-primary:disabled { opacity: 0.5; cursor: default; }
 	.btn-secondary {
-		padding: 10px 14px; background: #1a1a1a; color: #888;
-		border: 1px solid #2a2a2a; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
+		padding: 10px 14px; background: var(--surface); color: #888;
+		border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; cursor: pointer;
 	}
 	.btn-secondary.small { padding: 5px 10px; font-size: 0.78rem; align-self: flex-start; }
 </style>

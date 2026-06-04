@@ -442,7 +442,7 @@
 	}
 	.no-routine-text { color: #555; font-size: 1rem; }
 	.btn-go {
-		padding: 12px 24px; background: #4ade80; color: #0f0f0f;
+		padding: 12px 24px; background: var(--accent); color: var(--accent-on);
 		border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 0.95rem;
 	}
 
@@ -456,7 +456,7 @@
 	.timer.round-break { color: #f59e0b; }
 	.timer.warning     { color: #ff6b35; }
 	.bar-wrap { width: 100%; max-width: 340px; height: 5px; background: #222; border-radius: 3px; margin-bottom: 16px; overflow: hidden; }
-	.bar { height: 100%; border-radius: 3px; background: #4ade80; transition: width 0.9s linear, background 0.3s; }
+	.bar { height: 100%; border-radius: 3px; background: var(--accent); transition: width 0.9s linear, background 0.3s; }
 	.bar.pausa       { background: #4ecdc4; }
 	.bar.round-break { background: #f59e0b; }
 	.bar.warning     { background: #ff6b35; }
@@ -465,7 +465,7 @@
 		width: 120px; text-align: center; margin-bottom: 16px;
 		font-size: 2rem; font-weight: 700;
 		padding: 10px; border-radius: 10px;
-		background: #1a1a1a; border: 1px solid #333; color: #fff;
+		background: var(--surface); border: 1px solid #333; color: var(--text);
 		-moz-appearance: textfield;
 	}
 	.mark-input-timer::-webkit-outer-spin-button,
@@ -476,28 +476,28 @@
 	.dots-row { display: flex; align-items: center; gap: 8px; }
 	.dots-label { font-size: 0.65rem; color: #444; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; width: 80px; text-align: right; flex: none; }
 	.dots { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-	.dot { width: 10px; height: 10px; border-radius: 50%; background: #2a2a2a; transition: background 0.3s; }
-	.dot.done    { background: #4ade80; }
-	.dot.current { background: #fff; }
+	.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface-hover); transition: background 0.3s; }
+	.dot.done    { background: var(--accent); }
+	.dot.current { background: var(--text); }
 	.dot.is-pausa { width: 5px; height: 5px; }
 	.dot.is-pausa.done    { background: #2a6b67; }
 	.dot.is-pausa.current { background: #4ecdc4; }
 	.next-info { font-size: 0.9rem; color: #444; margin-bottom: 32px; min-height: 1.1rem; }
 	.controls  { display: flex; gap: 14px; }
-	.btn-start { padding: 18px 36px; font-size: 1.15rem; font-weight: 700; border: none; border-radius: 14px; cursor: pointer; min-width: 150px; background: #4ade80; color: #0f0f0f; }
+	.btn-start { padding: 18px 36px; font-size: 1.15rem; font-weight: 700; border: none; border-radius: 14px; cursor: pointer; min-width: 150px; background: var(--accent); color: var(--accent-on); }
 	.btn-start.running { background: #facc15; }
 	.btn-start:active { transform: scale(0.97); }
-	.btn-reset { padding: 18px 24px; font-size: 1.15rem; font-weight: 700; border: none; border-radius: 14px; cursor: pointer; background: #1e1e1e; color: #aaa; }
+	.btn-reset { padding: 18px 24px; font-size: 1.15rem; font-weight: 700; border: none; border-radius: 14px; cursor: pointer; background: var(--surface-hover); color: #aaa; }
 	.btn-reset:active { transform: scale(0.97); }
 	.finished { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding-top: 40px; }
-	.finished-title { font-size: 2.2rem; color: #4ade80; font-weight: 700; }
+	.finished-title { font-size: 2.2rem; color: var(--accent); font-weight: 700; }
 	.btn-save-log {
 		padding: 14px 28px; font-size: 1rem; font-weight: 700;
 		border: 1px solid #2a4a2a; border-radius: 12px; cursor: pointer;
-		background: #1a1a1a; color: #4ade80;
+		background: var(--surface); color: var(--accent);
 		width: 100%; max-width: 260px;
 	}
 	.btn-save-log:disabled { opacity: 0.5; cursor: default; }
-	.log-saved { color: #4ade80; font-size: 0.9rem; }
+	.log-saved { color: var(--accent); font-size: 0.9rem; }
 
 </style>
