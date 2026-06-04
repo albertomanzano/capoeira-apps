@@ -1,7 +1,7 @@
 # Supabase
 
 Proyecto: `biihtcuzcpyfagccrmij`. Compartido entre la [web](web.md) y la [app de luthería](lutheria.md).
-Migración a ejecutar en SQL Editor: `web_colectivo/supabase_migration.sql`.
+Migración: `web_colectivo/supabase_migration.sql` — ejecutar en SQL Editor si las tablas no existen.
 
 ## Tablas activas
 
@@ -10,26 +10,26 @@ Migración a ejecutar en SQL Editor: `web_colectivo/supabase_migration.sql`.
 **routines** — rutinas de entrenamiento
 **training_logs** — historial de entrenamientos
 
-## Schema rutinas y logs
+## Schema
 
 ```sql
 routines (
   id uuid PK, user_id uuid→auth.users,
   name text,
-  exercises jsonb,   -- Bloque[] (ver más abajo)
+  exercises jsonb,   -- Bloque[]
   created_at timestamptz
 )
 
 training_logs (
   id uuid PK, user_id uuid→auth.users,
   routine_id uuid→routines, routine_name text,
-  exercises jsonb,   -- BloqueLog[] (ver más abajo)
-  marks jsonb,       -- [] vacío (marcas embebidas en exercises)
+  exercises jsonb,   -- BloqueLog[] (snapshot con marks embebidas)
+  marks jsonb,       -- [] (legacy, no se usa)
   date date, created_at timestamptz
 )
 ```
 
-## Modelo de datos (junio 2026)
+## Modelo de datos
 
 ```typescript
 type Ex        = { name: string; duration_s: number }
@@ -37,17 +37,27 @@ type Bloque    = { name: string; exercises: Ex[] }
 type BloqueLog = { name: string; exercises: Ex[]; marks: (number|null)[] }
 ```
 
-Antes de junio 2026 `exercises` almacenaba `Ex[]` plano. Ya no hay registros con el formato antiguo.
-
 ## Políticas RLS
 
-Todas las tablas tienen RLS habilitado. Política en `routines` y `training_logs`:
+`user_id = auth.uid()` en todas las tablas — cada usuario solo ve sus propios datos.
 
 ```sql
-USING  (user_id = auth.uid() OR is_profe())
-WITH CHECK (user_id = auth.uid())
+-- aplicado en supabase_migration.sql
+DROP POLICY IF EXISTS "own_all" ON routines;
+CREATE POLICY "own_all" ON routines
+  FOR ALL TO authenticated
+  USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 ```
 
-## Política RLS
+La versión antigua usaba `OR is_profe()` en la cláusula USING, función que nunca se definió. La migración incluye el DROP para reemplazarla correctamente.
 
-Simplificada a `user_id = auth.uid()` en ambas tablas. La `supabase_migration.sql` incluye el `DROP POLICY IF EXISTS` + `CREATE POLICY` correcto. Si las tablas ya existen y la política es la antigua (con `is_profe()`), hay que volver a ejecutar la migración.
+## Compatibilidad formato antiguo
+
+Antes de junio 2026 `exercises` almacenaba `Ex[]` plano (sin bloques). El frontend normaliza automáticamente al cargar (`normalize()` en rutinas/+page.svelte), pero los datos viejos en Supabase se pueden borrar con:
+
+```sql
+DELETE FROM routines
+WHERE exercises != '[]'::jsonb
+  AND (exercises->0->>'duration_s') IS NOT NULL
+  AND (exercises->0->'exercises') IS NULL;
+```
