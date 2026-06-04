@@ -156,15 +156,17 @@
 		await load();
 	}
 
-	function launchTimer(bloque: Bloque) {
+	function launchTimer(bloque: Bloque, routineId: string, routineName: string) {
 		localStorage.removeItem('capoeira_timer_rutina');
 		localStorage.setItem('capoeira_timer_bloque', JSON.stringify(cloneBloque(bloque)));
+		localStorage.setItem('capoeira_timer_meta', JSON.stringify({ routine_id: routineId, routine_name: routineName }));
 		goto('/members/timer');
 	}
 
 	function launchTimerRutina(r: Routine) {
 		localStorage.removeItem('capoeira_timer_bloque');
 		localStorage.setItem('capoeira_timer_rutina', JSON.stringify({ name: r.name, exercises: r.exercises }));
+		localStorage.setItem('capoeira_timer_meta', JSON.stringify({ routine_id: r.id, routine_name: r.name }));
 		goto('/members/timer');
 	}
 
@@ -257,7 +259,7 @@
 						<div class="bloque-header">
 							<span class="bloque-title">{bloque.name || `Bloque ${bi + 1}`}</span>
 							<span class="bloque-count">{bloque.exercises.filter(e => !isDescanso(e.name)).length} ej</span>
-							<button class="btn-play" onclick={() => launchTimer(bloque)}>▶</button>
+							<button class="btn-play" onclick={() => launchTimer(bloque, r.id, r.name)}>▶</button>
 						</div>
 						<div class="ex-pills">
 							{#each bloque.exercises.filter(e => !isDescanso(e.name)) as ex}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { supabase } from '$lib/supabase';
 	import Shell from '$lib/Shell.svelte';
 
 	type ExData    = { name: string; duration_s: number };
@@ -19,6 +20,7 @@
 	let cfg           = $state({ ...CFG_DEFAULTS });
 	let routineBloque = $state<BloqueData | null>(null);
 	let routineData   = $state<RutinaData | null>(null);
+	let routineMeta   = $state<{ routine_id: string; routine_name: string } | null>(null);
 
 	function loadCfg() {
 		const raw = typeof localStorage !== 'undefined' && localStorage.getItem(CFG_KEY);
@@ -78,6 +80,13 @@
 	let inRoundBreak  = $state(false);
 	let started       = $state(false);
 
+	// marks state
+	let marks        = $state<(number | null)[]>([]);
+	let currentExIdx = $state(0);
+	let lastExName   = $state('');
+	let logSaved     = $state(false);
+	let logBusy      = $state(false);
+
 	let voices        = $state<SpeechSynthesisVoice[]>([]);
 	let selectedVoice = $state<SpeechSynthesisVoice | null>(null);
 
@@ -100,6 +109,19 @@
 		nextPhase?.type === 'pausa' ? 'A continuación: Pausa' :
 		`A continuación: ${nextPhase?.name}`
 	);
+
+	const hasRoutine     = $derived(!!(routineBloque || routineData));
+	const showMarkInput  = $derived(
+		hasRoutine && started && !finished && marks.length > 0 && currentExIdx < marks.length
+	);
+
+	function initMarks() {
+		const total = PHASES.filter(p => p.type === 'ejercicio').length;
+		marks = Array(total).fill(null);
+		currentExIdx = 0;
+		lastExName = PHASES[0]?.type === 'ejercicio' ? PHASES[0].name : '';
+		logSaved = false;
+	}
 
 	function getCtx(): AudioContext {
 		if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -148,6 +170,8 @@
 	}
 
 	function startNextRound() {
+		currentExIdx = 0;
+		lastExName = PHASES[0]?.name ?? '';
 		beepTransition();
 		speak(`Bloque ${round + 1}. ${PHASES[0].name}`);
 		timeLeft = PHASES[0].duration;
@@ -180,6 +204,10 @@
 		const p = PHASES[phase];
 		speak(p.type === 'pausa' ? 'Pausa' : p.name);
 		timeLeft = p.duration;
+		if (p.type === 'ejercicio') {
+			currentExIdx++;
+			lastExName = p.name;
+		}
 	}
 
 	function doFinish() {
@@ -192,6 +220,7 @@
 		PHASES = buildPhases();
 		running = false; finished = false; started = false; inRoundBreak = false;
 		round = 0; phase = 0; timeLeft = PHASES[0].duration;
+		marks = []; currentExIdx = 0; lastExName = ''; logSaved = false; logBusy = false;
 	}
 
 	function startStop() {
@@ -200,7 +229,12 @@
 			if (ticker) { clearInterval(ticker); ticker = null; }
 			running = false;
 		} else {
-			if (!started) { started = true; beepTransition(); speak(PHASES[0].name); }
+			if (!started) {
+				started = true;
+				if (hasRoutine) initMarks();
+				beepTransition();
+				speak(PHASES[0].name);
+			}
 			ticker = setInterval(() => {
 				timeLeft--;
 				if (inRoundBreak) {
@@ -220,16 +254,57 @@
 		}
 	}
 
+	async function saveLog() {
+		if (!routineMeta) return;
+		logBusy = true;
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) { logBusy = false; return; }
+
+		let bloques: { name: string; exercises: ExData[]; marks: (number | null)[] }[];
+		let mIdx = 0;
+
+		if (routineData) {
+			bloques = routineData.exercises.map(bloque => {
+				const exs = bloque.exercises.filter(e => !isDescanso(e.name));
+				const bMarks = exs.map(() => marks[mIdx++] ?? null);
+				return { name: bloque.name, exercises: exs, marks: bMarks };
+			});
+		} else if (routineBloque) {
+			const exs = routineBloque.exercises.filter(e => !isDescanso(e.name));
+			const bMarks = exs.map(() => marks[mIdx++] ?? null);
+			bloques = [{ name: routineBloque.name, exercises: exs, marks: bMarks }];
+		} else {
+			logBusy = false;
+			return;
+		}
+
+		await supabase.from('training_logs').insert({
+			user_id:      user.id,
+			routine_id:   routineMeta.routine_id,
+			routine_name: routineMeta.routine_name,
+			exercises:    bloques,
+			marks:        [],
+			date:         new Date().toISOString().split('T')[0],
+		});
+		logSaved = true;
+		logBusy = false;
+	}
+
 	onMount(() => {
 		loadCfg();
 		const rawRutina = localStorage.getItem('capoeira_timer_rutina');
 		const rawBloque = localStorage.getItem('capoeira_timer_bloque');
+		const rawMeta   = localStorage.getItem('capoeira_timer_meta');
 		if (rawRutina) {
 			routineData = JSON.parse(rawRutina);
 			localStorage.removeItem('capoeira_timer_rutina');
 		} else if (rawBloque) {
 			routineBloque = JSON.parse(rawBloque);
 			localStorage.removeItem('capoeira_timer_bloque');
+		}
+		if (rawMeta) {
+			routineMeta = JSON.parse(rawMeta);
+			localStorage.removeItem('capoeira_timer_meta');
 		}
 		PHASES = buildPhases();
 		timeLeft = PHASES[0].duration;
@@ -279,6 +354,20 @@
 					style="width: {pct}%"></div>
 			</div>
 
+			{#if showMarkInput}
+				<div class="mark-row">
+					<span class="mark-ex-name">{lastExName}</span>
+					<input
+						type="number"
+						inputmode="numeric"
+						placeholder="reps"
+						value={marks[currentExIdx] ?? ''}
+						oninput={(e) => { marks[currentExIdx] = e.currentTarget.value ? Number(e.currentTarget.value) : null; }}
+						class="mark-input-timer"
+					/>
+				</div>
+			{/if}
+
 			{#if routineData}
 				<div class="dots-rutina">
 					{#each routineData.exercises as bloque}
@@ -314,6 +403,13 @@
 		<div class="finished">
 			<p class="finished-title">¡Completado!</p>
 			<p class="finished-sub">{ROUNDS} bloque{ROUNDS !== 1 ? 's' : ''} terminado{ROUNDS !== 1 ? 's' : ''}</p>
+			{#if routineMeta && !logSaved}
+				<button class="btn-save-log" onclick={saveLog} disabled={logBusy}>
+					{logBusy ? 'Guardando…' : 'Guardar entreno'}
+				</button>
+			{:else if logSaved}
+				<p class="log-saved">✓ Guardado en historial</p>
+			{/if}
 			<button class="btn-start" onclick={rebuildAndReset}>Volver a empezar</button>
 		</div>
 	{/if}
@@ -382,6 +478,21 @@
 	.bar.pausa       { background: #4ecdc4; }
 	.bar.round-break { background: #f59e0b; }
 	.bar.warning     { background: #ff6b35; }
+
+	.mark-row {
+		display: flex; align-items: center; justify-content: space-between;
+		gap: 12px; margin-bottom: 16px;
+		background: #1a1a1a; border-radius: 10px; padding: 10px 16px;
+		width: 100%; max-width: 340px;
+	}
+	.mark-ex-name { font-size: 0.85rem; color: #888; flex: 1; text-align: left; }
+	.mark-input-timer {
+		width: 80px; flex: none; text-align: center;
+		font-size: 1.3rem; font-weight: 700;
+		padding: 8px; border-radius: 8px;
+		background: #0f0f0f; border: 1px solid #333; color: #fff;
+	}
+
 	.dots-rutina { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; width: 100%; }
 	.dots-row { display: flex; align-items: center; gap: 8px; }
 	.dots-label { font-size: 0.65rem; color: #444; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; width: 80px; text-align: right; flex: none; }
@@ -402,6 +513,14 @@
 	.finished { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding-top: 40px; }
 	.finished-title { font-size: 2.2rem; color: #4ade80; font-weight: 700; }
 	.finished-sub   { color: #666; }
+	.btn-save-log {
+		padding: 14px 28px; font-size: 1rem; font-weight: 700;
+		border: 1px solid #2a4a2a; border-radius: 12px; cursor: pointer;
+		background: #1a1a1a; color: #4ade80;
+		width: 100%; max-width: 260px;
+	}
+	.btn-save-log:disabled { opacity: 0.5; cursor: default; }
+	.log-saved { color: #4ade80; font-size: 0.9rem; }
 
 	.config-settings, .voice-settings { margin-top: 24px; font-size: 0.85rem; color: #444; }
 	.config-settings summary, .voice-settings summary { cursor: pointer; user-select: none; }
