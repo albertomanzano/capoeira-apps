@@ -25,7 +25,7 @@
 		if (!email.trim()) { error = 'Escribe tu email'; return; }
 		busy = true; error = ''; info = '';
 		const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-			redirectTo: 'https://capoeiracolectiva.netlify.app/reset-password',
+			redirectTo: 'https://capoeira-colectiva.pages.dev/reset-password',
 		});
 		if (err) error = err.message;
 		else info = 'Email enviado. Revisa tu bandeja.';

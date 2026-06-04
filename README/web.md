@@ -1,12 +1,19 @@
 # Web principal
 
-Stack: SvelteKit 5 (Svelte 5 runes: `$state`, `$derived`, `$effect`) + [Supabase](supabase.md) + Netlify.
+Stack: SvelteKit 5 (Svelte 5 runes: `$state`, `$derived`, `$effect`) + [Supabase](supabase.md) + Cloudflare Pages.
 
-**URL producción**: https://capoeiracolectiva.netlify.app
+**URL producción**: https://capoeira-colectiva.pages.dev
 **Dev local**: `cd web_colectivo && npm run dev` → localhost:5173
-**Deploy**: `npm run build && npx netlify-cli deploy --prod --dir=build`
+**Deploy**: `cd web_colectivo && npm run build && wrangler pages deploy build --project-name=capoeira-colectiva --branch=main --commit-dirty=true`
 
 Sigue las [convenciones](convenciones.md) generales del proyecto.
+
+## Cloudflare Pages — notas de configuración
+
+- `svelte.config.js`: `adapter-static` con `fallback: 'index.html'` (no `200.html` — Cloudflare no lo soporta como rewrite)
+- `static/_redirects`: contiene `/* /index.html 200` para que SvelteKit maneje el routing client-side
+- Supabase Auth: en el dashboard del proyecto → Authentication → URL Configuration, Site URL y Redirect URLs deben incluir `https://capoeira-colectiva.pages.dev/**`
+- `login/+page.svelte`: el `redirectTo` del reset de contraseña apunta a `https://capoeira-colectiva.pages.dev/reset-password`
 
 ## Estructura de rutas
 
@@ -76,4 +83,4 @@ Rutinas creadas antes de junio 2026 usaban `Ex[]` plano. `normalize()` en `rutin
 
 - [ ] Construir web pública (home del Colectivo, info, contacto)
 - [ ] Dominio propio
-- [ ] Migrar Netlify → Cloudflare Pages (Netlify sin créditos)
+- [x] Migrar Netlify → Cloudflare Pages ✓ (2026-06-04)
