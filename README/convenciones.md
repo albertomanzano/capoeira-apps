@@ -25,8 +25,15 @@ Aplican tanto a la [web](web.md) como a la [app de luthería](lutheria.md).
 - Repo: `https://github.com/albertomanzano/capoeira-apps.git`
 - Push requiere credenciales de Alberto (Claude no las tiene almacenadas)
 
+## Workflow de desarrollo
+
+- Probar siempre en local (`npm run dev`) antes de hacer deploy
+- Deploy a Cloudflare Pages solo al final de la sesión, cuando Alberto confirma que funciona
+- Ver [web.md](web.md) para el comando de deploy exacto
+
 ## Knowledge management
 
 - CLAUDE.md es el índice — apunta a README/ con contexto suficiente para navegar
 - README/ contiene docs atómicos — cada uno con ≥1 inlink, ≥1 outlink, ≥3 links totales
 - Claude actualiza CLAUDE.md y README/ durante la sesión, no al final
+- Memory solo para perfil de Alberto y feedback sobre el comportamiento de Claude — nunca para estado técnico

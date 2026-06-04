@@ -15,6 +15,13 @@
 	let error      = $state('');
 	let expanded   = $state<Set<string>>(new Set());
 
+	function withDate(n: string): string {
+		const d = new Date();
+		const dd = String(d.getDate()).padStart(2, '0');
+		const mm = String(d.getMonth() + 1).padStart(2, '0');
+		return `${n} ${dd}/${mm}/${d.getFullYear()}`;
+	}
+
 	function fmt(s: number): string {
 		if (s < 60) return `${s}s`;
 		const m = Math.floor(s / 60), r = s % 60;
@@ -124,7 +131,7 @@
 			const { data: authData } = await supabase.auth.getUser();
 			if (!authData.user) { error = 'Sin sesión activa. Recarga la página.'; busy = false; return; }
 			const { error: dbErr } = await supabase.from('routines').insert({
-				user_id: authData.user.id, name: newName.trim(), exercises: bloques
+				user_id: authData.user.id, name: withDate(newName.trim()), exercises: bloques
 			});
 			if (dbErr) { error = dbErr.message; busy = false; return; }
 			creating = false;

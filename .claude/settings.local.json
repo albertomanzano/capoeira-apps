@@ -58,7 +58,13 @@
       "Bash(netlify sites:list)",
       "Bash(netlify link *)",
       "Bash(netlify deploy *)",
-      "Bash(netlify --version)"
+      "Bash(netlify --version)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(wait)",
+      "Bash(npx netlify-cli *)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(wrangler pages *)"
     ]
   },
   "enabledPlugins": {

@@ -12,6 +12,7 @@ dependencies = [
 org = "com.luteria"
 product = "Lutería"
 description = "App de luthería para berimbau"
+icon = "assets/icon.png"
 
 [tool.flet.permissions]
 microphone = true

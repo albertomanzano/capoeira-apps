@@ -8,6 +8,17 @@
 	type Bloque = { name: string; exercises: Ex[] };
 
 	const id = $derived($page.params.id);
+
+	function withDate(n: string): string {
+		const d = new Date();
+		const dd = String(d.getDate()).padStart(2, '0');
+		const mm = String(d.getMonth() + 1).padStart(2, '0');
+		return `${n} ${dd}/${mm}/${d.getFullYear()}`;
+	}
+
+	function stripDate(n: string): string {
+		return n.replace(/ \d{2}\/\d{2}\/\d{4}$/, '').trim();
+	}
 	let name    = $state('');
 	let bloques = $state<Bloque[]>([]);
 	let busy    = $state(false);
@@ -23,7 +34,7 @@
 			.select('name, exercises')
 			.eq('id', id)
 			.single();
-		if (data) { name = data.name; bloques = data.exercises as Bloque[]; }
+		if (data) { name = stripDate(data.name); bloques = data.exercises as Bloque[]; }
 	}
 
 	function addBloque() {
@@ -76,8 +87,12 @@
 		if (!name.trim()) { error = 'Ponle nombre'; return; }
 		if (filtered.length === 0) { error = 'Al menos un ejercicio'; return; }
 		busy = true; error = '';
-		const { error: dbErr } = await supabase
-			.from('routines').update({ name: name.trim(), exercises: filtered }).eq('id', id);
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) { error = 'Sin sesión activa'; busy = false; return; }
+		await supabase.from('routines').delete().eq('id', id);
+		const { error: dbErr } = await supabase.from('routines').insert({
+			user_id: user.id, name: withDate(name.trim()), exercises: filtered
+		});
 		if (dbErr) { error = dbErr.message; busy = false; return; }
 		goto('/members/rutinas');
 	}

@@ -10,8 +10,16 @@ Leer siempre la skill de gestión de conocimiento: `/home/alberto/.claude/skills
 
 - **Conocimiento**: actualizar CLAUDE.md y README/ durante la sesión, sin esperar al final
 - **Git**: commit y push tras cada sesión — Alberto no gestiona git directamente
-- **Deploy web**: `npm run build && npx netlify-cli deploy --prod --dir=build` desde `web_colectivo/`
+- **Deploy web**: `cd web_colectivo && npm run build && wrangler pages deploy build --project-name=capoeira-colectiva --branch=main --commit-dirty=true` — solo al final de la sesión, después de probar en local
 - **Supabase**: documentar cambios de schema en [supabase.md](README/supabase.md) y recordar a Alberto ejecutar las migraciones
+
+## Memoria vs README
+
+**Memory** (`~/.claude/projects/.../memory/`) es solo para:
+- Perfil de Alberto (quién es, cómo trabaja)
+- Feedback sobre el comportamiento de Claude
+
+**Nunca en memoria**: URLs, comandos, estado técnico del proyecto, convenciones de código, workflow de deploy. Eso va en README/.
 
 ## El proyecto
 

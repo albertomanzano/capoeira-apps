@@ -62,7 +62,7 @@ Un ejercicio llamado "Descanso" (insensible a mayúsculas) se trata como pausa e
 ## Funcionalidades
 
 - **Auth**: login, registro, reset-password, logout, cambio de contraseña
-- **Rutinas**: crear/editar/borrar/copiar. Bloques con ejercicios. Vista colapsable con resumen (bloques · ejercicios · duración total). Copiar bloque. Botón ▶ por bloque (lanza timer con ese bloque) y ▶ en la tarjeta (lanza timer con la rutina completa).
+- **Rutinas**: crear/editar/borrar/copiar. Al guardar (nueva o editada), la fecha actual se añade automáticamente al nombre (`DD/MM/YYYY`). Editar = borrar fila antigua + insertar nueva (inmutable). El formulario de edición muestra el nombre sin la fecha. Bloques con ejercicios. Vista colapsable con resumen (bloques · ejercicios · duración total). Copiar bloque. Botón ▶ por bloque (lanza timer con ese bloque) y ▶ en la tarjeta (lanza timer con la rutina completa).
 - **Entrenar**: seleccionar rutina → ejercicios por bloque → anotar marca → guardar con fecha. No muestra "Descanso".
 - **Historial**: cards desplegables con bloques, marcas y duración total. No muestra "Descanso".
 - **Timer**: dos modos:
