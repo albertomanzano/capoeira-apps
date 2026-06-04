@@ -1,26 +1,13 @@
 <script lang="ts">
-	import { supabase } from '$lib/supabase';
-	import { goto } from '$app/navigation';
-	import { role } from '$lib/stores/auth';
-
 	let { tab, children } = $props<{ tab: string; children: any }>();
-
-	async function logout() {
-		await supabase.auth.signOut();
-		goto('/login');
-	}
 </script>
 
 <div class="shell">
 	<div class="topbar">
 		<span class="brand">Capoeira</span>
 		<div class="topbar-right">
-			{#if $role === 'profe'}
-				<a href="/members/alumnos" class="top-link" class:active={tab === 'alumnos'}>Alumnos</a>
-			{/if}
 			<a href="/members/descargas" class="top-link" class:active={tab === 'descargas'}>⬇</a>
-			<a href="/members/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Perfil">⚙</a>
-			<button class="logout" onclick={logout}>Salir</button>
+			<a href="/members/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Ajustes">⚙</a>
 		</div>
 	</div>
 
@@ -61,8 +48,6 @@
 	}
 	.top-link.active { color: #4ade80; }
 	.top-link:hover  { color: #888; }
-	.logout { background: none; border: none; color: #444; cursor: pointer; font-size: 0.85rem; }
-	.logout:hover { color: #888; }
 	.content {
 		flex: 1;
 		padding: 16px;

@@ -87,7 +87,6 @@
 	let logSaved     = $state(false);
 	let logBusy      = $state(false);
 
-	let voices        = $state<SpeechSynthesisVoice[]>([]);
 	let selectedVoice = $state<SpeechSynthesisVoice | null>(null);
 
 	let audioCtx: AudioContext | null = null;
@@ -154,18 +153,12 @@
 	function populateVoices() {
 		const v = window.speechSynthesis.getVoices();
 		if (!v.length) return;
-		voices = v;
 		const saved = localStorage.getItem('capoeira_voice');
 		const match = saved ? v.find(x => x.name === saved) : null;
 		if (match) { selectedVoice = match; return; }
 		const spanish = v.filter(x => x.lang.startsWith('es'));
 		const premium = spanish.find(x => /natural|neural|premium|enhanced/i.test(x.name));
 		selectedVoice = premium || spanish[0] || v[0] || null;
-	}
-
-	function selectVoice(i: number) {
-		selectedVoice = voices[i];
-		if (selectedVoice) localStorage.setItem('capoeira_voice', selectedVoice.name);
 	}
 
 	function startNextRound() {
@@ -401,19 +394,6 @@
 			</div>
 		{/if}
 
-		<details class="voice-settings">
-			<summary>Voz</summary>
-			<div class="voice-panel">
-				<select class="voice-select"
-					value={voices.indexOf(selectedVoice!)}
-					onchange={(e) => selectVoice(parseInt(e.currentTarget.value))}>
-					{#each voices as v, i}
-						<option value={i}>{v.name} ({v.lang})</option>
-					{/each}
-				</select>
-				<button class="btn-test" onclick={() => speak('Ejercicio uno. Diez. Veinte. Treinta.')}>Probar</button>
-			</div>
-		</details>
 	{/if}
 </Shell>
 
@@ -481,25 +461,4 @@
 	.btn-save-log:disabled { opacity: 0.5; cursor: default; }
 	.log-saved { color: #4ade80; font-size: 0.9rem; }
 
-	.voice-settings { margin-top: 24px; font-size: 0.85rem; color: #444; }
-	.voice-settings summary { cursor: pointer; user-select: none; }
-	.config-panel, .voice-panel {
-		display: flex; flex-direction: column; gap: 8px;
-		margin-top: 8px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px 12px;
-	}
-	.cfg-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-	.cfg-label { font-size: 0.8rem; color: #777; }
-	.stepper { display: flex; align-items: center; gap: 6px; }
-	.stepper button {
-		width: 28px; height: 28px; padding: 0;
-		background: #2a2a2a; color: #aaa; border: 1px solid #333;
-		border-radius: 6px; font-size: 1.1rem; cursor: pointer;
-		display: flex; align-items: center; justify-content: center;
-	}
-	.stepper button:disabled { opacity: 0.3; cursor: default; }
-	.stepper span { color: #ccc; font-size: 0.9rem; min-width: 28px; text-align: center; }
-	.cfg-note { font-size: 0.75rem; color: #555; text-align: center; }
-
-	.voice-select { background: #222; color: #ccc; border: 1px solid #444; border-radius: 6px; padding: 6px 8px; font-size: 0.8rem; }
-	.btn-test { padding: 6px 12px; font-size: 0.8rem; background: #333; color: #aaa; border: none; border-radius: 6px; cursor: pointer; align-self: flex-start; }
 </style>
