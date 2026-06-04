@@ -6,6 +6,7 @@
 	type ExData     = { name: string; duration_s: number };
 	type BloqueData = { name: string; exercises: ExData[] };
 	type RutinaData = { name: string; exercises: BloqueData[] };
+	type BloqueLog  = { name: string; exercises: ExData[]; marks: (number | null)[] };
 
 	const CFG_KEY = 'capoeira_timer_config';
 	const CFG_DEFAULTS = { pauseSec: 30, rounds: 2, roundBreakSec: 60 };
@@ -82,6 +83,7 @@
 	let started      = $state(false);
 
 	let marks        = $state<(number | null)[]>([]);
+	let lastMarks    = $state<(number | null)[]>([]);
 	let currentExIdx = $state(0);
 	let lastExName   = $state('');
 	let logSaved     = $state(false);
@@ -246,6 +248,38 @@
 		}
 	}
 
+	async function loadLastMarks() {
+		if (!routineMeta?.routine_id) return;
+		const { data } = await supabase
+			.from('training_logs')
+			.select('exercises')
+			.eq('routine_id', routineMeta.routine_id)
+			.order('date', { ascending: false })
+			.limit(1)
+			.single();
+		if (!data) return;
+
+		const logBloques: BloqueLog[] = data.exercises ?? [];
+		const flat: (number | null)[] = [];
+
+		if (routineData) {
+			for (const bloque of logBloques) {
+				const exs = bloque.exercises ?? [];
+				exs.forEach((e, i) => {
+					if (!isDescanso(e.name)) flat.push(bloque.marks?.[i] ?? null);
+				});
+			}
+		} else if (routineBloque) {
+			const match = logBloques.find(b => b.name === routineBloque!.name) ?? logBloques[0];
+			if (match) {
+				(match.exercises ?? []).forEach((e, i) => {
+					if (!isDescanso(e.name)) flat.push(match.marks?.[i] ?? null);
+				});
+			}
+		}
+		lastMarks = flat;
+	}
+
 	async function saveLog() {
 		if (!routineMeta) return;
 		logBusy = true;
@@ -299,6 +333,7 @@
 			localStorage.removeItem('capoeira_timer_meta');
 		}
 		PHASES = buildPhases();
+		loadLastMarks();
 		timeLeft = PHASES[0].duration;
 		mounted = true;
 		if (window.speechSynthesis) {
@@ -347,6 +382,9 @@
 						oninput={(e) => { marks[currentExIdx] = e.currentTarget.value ? Number(e.currentTarget.value) : null; }}
 						class="mark-input-timer"
 					/>
+					{#if lastMarks[currentExIdx] != null}
+						<p class="last-mark">Última vez: {lastMarks[currentExIdx]}</p>
+					{/if}
 				{/if}
 
 				{#if routineData}
@@ -432,6 +470,7 @@
 	}
 	.mark-input-timer::-webkit-outer-spin-button,
 	.mark-input-timer::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+	.last-mark { font-size: 0.8rem; color: #555; margin-top: 4px; margin-bottom: 8px; }
 
 	.dots-rutina { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; width: 100%; }
 	.dots-row { display: flex; align-items: center; gap: 8px; }

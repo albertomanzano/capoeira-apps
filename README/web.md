@@ -23,7 +23,9 @@ Sigue las [convenciones](convenciones.md) generales del proyecto.
 
 /members/                ← requiere login (auth guard en members/+layout.svelte)
     /rutinas             — gestión de rutinas; lanza el timer con ▶
-    /historial           — historial de entrenamientos
+    /historial           — historial agrupado por rutina
+    /historial/nueva     — añadir entrada manual (sin pasar por el timer)
+    /historial/[id]      — detalle de una sesión: marcas editables + borrar
     /timer               — timer con voz (solo accesible desde ▶ en rutinas)
     /descargas           — descargar app de luthería
     /mi-perfil           — nombre + cambiar contraseña + selector de voz + logout
@@ -62,10 +64,12 @@ Un ejercicio llamado "Descanso" (insensible a mayúsculas) se trata como pausa e
 - **Timer**: lanzado siempre desde ▶ en Rutinas — sin acceso directo desde nav.
   - **Bloque**: usa los ejercicios del bloque; config disponible: pausa, bloques (repeticiones), descanso entre bloques.
   - **Rutina completa**: encadena todos los bloques en secuencia, se ejecuta una sola vez (ROUNDS=1). Config disponible: solo pausa. Barra de puntos por bloque.
-  - Durante cada ejercicio (y la pausa siguiente) aparece un input para anotar reps.
+  - Durante cada ejercicio aparece un input para anotar reps. Si existe una sesión anterior para esa rutina, muestra "Última vez: X" debajo del input (cargado de `training_logs` al inicio).
   - Al terminar: botón "Guardar entreno" → guarda en `training_logs`. Sin rutina cargada: pantalla "Ve a Rutinas".
   - Voz (Web Speech API) + beeps: ejercicios cada 5s; pausas cuenta atrás 10→4; beeps en 3, 2, 1. El selector de voz está en Perfil (mi-perfil), guardado en localStorage.
-- **Historial**: cards desplegables con bloques, marcas y duración total. Las marcas son inputs editables — se guardan en Supabase al salir del campo (onblur). No muestra "Descanso".
+- **Historial**: agrupado por rutina. Cada grupo muestra nº de sesiones y fecha más reciente, ordenado por sesión más reciente arriba. Al desplegar un grupo aparecen las sesiones (fecha + resumen); al pulsar una sesión se navega a `/historial/[id]`. Botón "+ Añadir" para registrar una sesión manualmente sin pasar por el timer.
+  - `/historial/[id]`: detalle con marcas editables (guardado onblur) y botón de borrar.
+  - `/historial/nueva`: elegir rutina + fecha + rellenar marcas → guarda en `training_logs`.
 - **Descargas**: APK de luthería (requiere login)
 - **Perfil** (`mi-perfil`): nombre, cambiar contraseña, selector de voz preferida, logout.
 
