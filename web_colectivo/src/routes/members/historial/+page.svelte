@@ -23,8 +23,17 @@
 		return `${day}/${m}/${y.slice(2)}`;
 	}
 
+	const isDescanso = (name: string) => /^descanso$/i.test(name.trim());
+
 	function totalExs(bloques: BloqueLog[]) {
-		return bloques.reduce((s, b) => s + b.exercises.length, 0);
+		return bloques.reduce((s, b) => s + b.exercises.filter(e => !isDescanso(e.name)).length, 0);
+	}
+
+	function totalDuration(bloques: BloqueLog[]): string {
+		const secs = bloques.reduce((s, b) => s + b.exercises.reduce((bs, e) => bs + e.duration_s, 0), 0);
+		if (secs < 60) return `${secs}s`;
+		const m = Math.floor(secs / 60), r = secs % 60;
+		return r ? `${m}m${r}s` : `${m}m`;
 	}
 
 	async function load() {
@@ -67,7 +76,7 @@
 						<span class="log-routine">{log.routine_name}</span>
 					</div>
 					<span class="log-summary">
-						{log.exercises.length} bloque{log.exercises.length !== 1 ? 's' : ''} · {totalExs(log.exercises)} ej
+						{log.exercises.length} bl · {totalExs(log.exercises)} ej · {totalDuration(log.exercises)}
 					</span>
 					<button class="btn-del" onclick={(e) => remove(log.id, e)}>✕</button>
 				</div>
@@ -78,11 +87,13 @@
 							<div class="log-bloque">
 								<p class="bloque-name">{bloque.name || `Bloque ${bi + 1}`}</p>
 								{#each bloque.exercises as ex, ei}
-									<div class="log-ex">
-										<span class="log-ex-name">{ex.name}</span>
-										<span class="log-ex-dur">{fmt(ex.duration_s)}</span>
-										<span class="log-mark">{bloque.marks?.[ei] ?? '—'}</span>
-									</div>
+									{#if !isDescanso(ex.name)}
+										<div class="log-ex">
+											<span class="log-ex-name">{ex.name}</span>
+											<span class="log-ex-dur">{fmt(ex.duration_s)}</span>
+											<span class="log-mark">{bloque.marks?.[ei] ?? '—'}</span>
+										</div>
+									{/if}
 								{/each}
 							</div>
 						{/each}

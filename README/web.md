@@ -32,28 +32,45 @@ Sigue las [convenciones](convenciones.md) generales del proyecto.
 
 ## Modelo de datos — rutinas
 
-El campo `exercises` en Supabase almacena `Bloque[]`. Cada bloque agrupa ejercicios y se puede lanzar de forma independiente desde el timer.
-
 ```typescript
 type Ex        = { name: string; duration_s: number }
 type Bloque    = { name: string; exercises: Ex[] }
 type BloqueLog = { name: string; exercises: Ex[]; marks: (number|null)[] }
 
-// routines.exercises:     Bloque[]
-// training_logs.exercises: BloqueLog[]  (snapshot + marks por ejercicio)
+// routines.exercises:      Bloque[]
+// training_logs.exercises: BloqueLog[]
 ```
 
 Ver [supabase.md](supabase.md) para el schema completo y políticas RLS.
 
-## Funcionalidades implementadas
+## Convención: ejercicio "Descanso"
+
+Un ejercicio llamado "Descanso" (insensible a mayúsculas) se trata como pausa explícita:
+
+- **Rutinas**: no cuenta en el total de ejercicios ni aparece en los pills
+- **Entrenar**: no se muestra (sin input de marca), no se guarda en el log
+- **Historial**: no se muestra
+- **Timer**: se trata como fase de tipo `pausa` (color teal, cuenta atrás), sin pausa automática antes
+
+## Funcionalidades
 
 - **Auth**: login, registro, reset-password, logout, cambio de contraseña
-- **Rutinas**: crear/editar/borrar/copiar. Organizadas en bloques. Vista colapsable. Copiar bloque. Botón ▶ por bloque que precarga el timer vía `localStorage`.
-- **Entrenar**: seleccionar rutina → ejercicios por bloque → anotar marca numérica → guardar con fecha
-- **Historial**: cards desplegables con bloques y marcas
-- **Timer**: configurable (ejercicios, duración, pausas, rounds). Carga bloque desde rutina. Voz (Web Speech API) + beeps + colores por fase.
+- **Rutinas**: crear/editar/borrar/copiar. Bloques con ejercicios. Vista colapsable con resumen (bloques · ejercicios · duración total). Copiar bloque. Botón ▶ por bloque (lanza timer con ese bloque) y ▶ en la tarjeta (lanza timer con la rutina completa).
+- **Entrenar**: seleccionar rutina → ejercicios por bloque → anotar marca → guardar con fecha. No muestra "Descanso".
+- **Historial**: cards desplegables con bloques, marcas y duración total. No muestra "Descanso".
+- **Timer**: dos modos:
+  - **Manual**: configura número de ejercicios, duración, pausa, rondas y descanso entre rondas
+  - **Bloque**: lanzado desde ▶ de un bloque — usa los ejercicios del bloque, ignora config de ejercicios/duración
+  - **Rutina completa**: lanzado desde ▶ de la tarjeta de rutina — encadena todos los bloques. La barra de puntos muestra una fila por bloque con el nombre a la izquierda. El header muestra el nombre del bloque activo.
+  - Voz (Web Speech API) + beeps:
+    - **Ejercicios**: voz cada 5s de tiempo transcurrido; beeps en 3, 2, 1
+    - **Pausas**: voz cuenta atrás 10→4; beeps en 3, 2, 1
 - **Alumnos**: el profe gestiona la lista (añadir/borrar)
 - **Descargas**: APK de luthería (requiere login)
+
+## Compatibilidad datos antiguos
+
+Rutinas creadas antes de junio 2026 usaban `Ex[]` plano. `normalize()` en `rutinas/+page.svelte` las convierte a `Bloque[]` al cargar. Ver [supabase.md](supabase.md) para el SQL de limpieza.
 
 ## Pendiente
 

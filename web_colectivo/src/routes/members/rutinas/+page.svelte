@@ -21,8 +21,17 @@
 		return r ? `${m}m${r}s` : `${m}m`;
 	}
 
+	const isDescanso = (name: string) => /^descanso$/i.test(name.trim());
+
 	function totalExs(bloques: Bloque[]) {
-		return bloques.reduce((s, b) => s + b.exercises.length, 0);
+		return bloques.reduce((s, b) => s + b.exercises.filter(e => !isDescanso(e.name)).length, 0);
+	}
+
+	function totalDuration(bloques: Bloque[]): string {
+		const secs = bloques.reduce((s, b) => s + b.exercises.reduce((bs, e) => bs + e.duration_s, 0), 0);
+		if (secs < 60) return `${secs}s`;
+		const m = Math.floor(secs / 60), r = secs % 60;
+		return r ? `${m}m${r}s` : `${m}m`;
 	}
 
 	function cloneBloque(b: Bloque): Bloque {
@@ -141,7 +150,14 @@
 	}
 
 	function launchTimer(bloque: Bloque) {
+		localStorage.removeItem('capoeira_timer_rutina');
 		localStorage.setItem('capoeira_timer_bloque', JSON.stringify(cloneBloque(bloque)));
+		goto('/members/timer');
+	}
+
+	function launchTimerRutina(r: Routine) {
+		localStorage.removeItem('capoeira_timer_bloque');
+		localStorage.setItem('capoeira_timer_rutina', JSON.stringify({ name: r.name, exercises: r.exercises }));
 		goto('/members/timer');
 	}
 
@@ -217,10 +233,11 @@
 				<span class="chevron">{expanded.has(r.id) ? '▾' : '▸'}</span>
 				<span class="routine-name">{r.name}</span>
 				<span class="routine-meta">
-					{r.exercises.length} bloque{r.exercises.length !== 1 ? 's' : ''} · {totalExs(r.exercises)} ej
+					{r.exercises.length} bl · {totalExs(r.exercises)} ej · {totalDuration(r.exercises)}
 				</span>
 			</button>
 			<div class="routine-actions">
+				<button class="btn-play" onclick={(e) => { e.stopPropagation(); launchTimerRutina(r); }} title="Timer rutina completa">▶</button>
 				<button class="btn-icon" onclick={() => copyRoutine(r)} title="Copiar rutina">⎘</button>
 				<button class="btn-icon" onclick={() => goto(`/members/rutinas/${r.id}`)}>✎</button>
 				<button class="btn-icon danger" onclick={() => remove(r.id, r.name)}>✕</button>
@@ -232,11 +249,11 @@
 					<div class="bloque-item">
 						<div class="bloque-header">
 							<span class="bloque-title">{bloque.name || `Bloque ${bi + 1}`}</span>
-							<span class="bloque-count">{bloque.exercises.length} ej</span>
+							<span class="bloque-count">{bloque.exercises.filter(e => !isDescanso(e.name)).length} ej</span>
 							<button class="btn-play" onclick={() => launchTimer(bloque)}>▶</button>
 						</div>
 						<div class="ex-pills">
-							{#each bloque.exercises as ex}
+							{#each bloque.exercises.filter(e => !isDescanso(e.name)) as ex}
 								<span class="pill">{ex.name}<span class="pill-dur"> {fmt(ex.duration_s)}</span></span>
 							{/each}
 						</div>

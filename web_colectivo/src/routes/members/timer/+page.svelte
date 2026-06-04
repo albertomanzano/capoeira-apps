@@ -2,7 +2,9 @@
 	import { onMount, onDestroy } from 'svelte';
 	import Shell from '$lib/Shell.svelte';
 
-	type BloqueData = { name: string; exercises: { name: string; duration_s: number }[] };
+	type ExData    = { name: string; duration_s: number };
+	type BloqueData = { name: string; exercises: ExData[] };
+	type RutinaData = { name: string; exercises: BloqueData[] };
 
 	const CFG_KEY = 'capoeira_timer_config';
 	const CFG_DEFAULTS = { exercises: 7, exerciseMin: 1, pauseSec: 30, rounds: 2, roundBreakSec: 60 };
@@ -16,6 +18,7 @@
 
 	let cfg           = $state({ ...CFG_DEFAULTS });
 	let routineBloque = $state<BloqueData | null>(null);
+	let routineData   = $state<RutinaData | null>(null);
 
 	function loadCfg() {
 		const raw = typeof localStorage !== 'undefined' && localStorage.getItem(CFG_KEY);
@@ -30,17 +33,38 @@
 		if (!running) rebuildAndReset();
 	}
 
+	const isDescanso = (name: string) => /^descanso$/i.test(name.trim());
+
+	function buildPhasesFromExList(exList: { name: string; dur: number }[]) {
+		const phases: { name: string; type: string; duration: number }[] = [];
+		for (let i = 0; i < exList.length; i++) {
+			const ex = exList[i];
+			if (isDescanso(ex.name)) {
+				phases.push({ name: 'Descanso', type: 'pausa', duration: ex.dur });
+			} else {
+				phases.push({ name: ex.name, type: 'ejercicio', duration: ex.dur });
+				const nextIsDescanso = i < exList.length - 1 && isDescanso(exList[i + 1].name);
+				if (i < exList.length - 1 && !nextIsDescanso) {
+					phases.push({ name: 'Pausa', type: 'pausa', duration: cfg.pauseSec });
+				}
+			}
+		}
+		return phases;
+	}
+
 	function buildPhases() {
+		if (routineData) {
+			const phases: { name: string; type: string; duration: number; bloque?: string }[] = [];
+			routineData.exercises.forEach((bloque) => {
+				const exList = bloque.exercises.map(e => ({ name: e.name, dur: e.duration_s }));
+				buildPhasesFromExList(exList).forEach(p => phases.push({ ...p, bloque: bloque.name }));
+			});
+			return phases;
+		}
 		const exList = routineBloque
 			? routineBloque.exercises.map(e => ({ name: e.name, dur: e.duration_s }))
 			: Array.from({ length: cfg.exercises }, (_, i) => ({ name: `Ejercicio ${i + 1}`, dur: cfg.exerciseMin * 60 }));
-
-		const phases: { name: string; type: string; duration: number }[] = [];
-		for (let i = 0; i < exList.length; i++) {
-			phases.push({ name: exList[i].name, type: 'ejercicio', duration: exList[i].dur });
-			if (i < exList.length - 1) phases.push({ name: 'Pausa', type: 'pausa', duration: cfg.pauseSec });
-		}
-		return phases;
+		return buildPhasesFromExList(exList);
 	}
 
 	let PHASES        = $state(buildPhases());
@@ -181,12 +205,15 @@
 				timeLeft--;
 				if (inRoundBreak) {
 					if (timeLeft === 3 || timeLeft === 2 || timeLeft === 1) beepWarning();
+					else if (timeLeft >= 4 && timeLeft <= 10) speak(String(timeLeft));
 					if (timeLeft <= 0) endRoundBreak();
 					return;
 				}
 				const e = PHASES[phase].duration - timeLeft;
+				const isPausaPhase = PHASES[phase].type === 'pausa';
 				if (timeLeft === 3 || timeLeft === 2 || timeLeft === 1) beepWarning();
-				else if (e > 0 && e % 5 === 0) speak(String(e));
+				else if (isPausaPhase && timeLeft >= 4 && timeLeft <= 10) speak(String(timeLeft));
+				else if (!isPausaPhase && e > 0 && e % 5 === 0) speak(String(e));
 				if (timeLeft <= 0) advance();
 			}, 1000);
 			running = true;
@@ -195,9 +222,13 @@
 
 	onMount(() => {
 		loadCfg();
-		const raw = localStorage.getItem('capoeira_timer_bloque');
-		if (raw) {
-			routineBloque = JSON.parse(raw);
+		const rawRutina = localStorage.getItem('capoeira_timer_rutina');
+		const rawBloque = localStorage.getItem('capoeira_timer_bloque');
+		if (rawRutina) {
+			routineData = JSON.parse(rawRutina);
+			localStorage.removeItem('capoeira_timer_rutina');
+		} else if (rawBloque) {
+			routineBloque = JSON.parse(rawBloque);
 			localStorage.removeItem('capoeira_timer_bloque');
 		}
 		PHASES = buildPhases();
@@ -215,8 +246,10 @@
 </script>
 
 <Shell tab="timer">
-	{#if routineBloque}
-		<p class="routine-pill">{routineBloque.name || 'Bloque de rutina'}</p>
+	{#if routineData}
+		<p class="routine-pill">▶ {routineData.name}</p>
+	{:else if routineBloque}
+		<p class="routine-pill">{routineBloque.name || 'Bloque'}</p>
 	{/if}
 
 	{#if !finished}
@@ -226,7 +259,13 @@
 				<p class="phase-label round-break">Bloque {round + 1} → {round + 2}</p>
 				<p class="phase-name"></p>
 			{:else}
-				<p class="round-info">Bloque {round + 1} de {ROUNDS}</p>
+				<p class="round-info">
+					{#if routineData && PHASES[phase]?.bloque}
+						{PHASES[phase].bloque}
+					{:else}
+						Bloque {round + 1} de {ROUNDS}
+					{/if}
+				</p>
 				<p class="phase-label {isPausa ? 'pausa' : ''}">{isPausa ? 'Pausa' : 'Ejercicio'}</p>
 				<p class="phase-name">{isPausa ? '' : PHASES[phase].name}</p>
 			{/if}
@@ -240,11 +279,27 @@
 					style="width: {pct}%"></div>
 			</div>
 
-			<div class="dots">
-				{#each PHASES as p, i}
-					<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {i < phase ? 'done' : ''} {i === phase && !inRoundBreak ? 'current' : ''}"></div>
-				{/each}
-			</div>
+			{#if routineData}
+				<div class="dots-rutina">
+					{#each routineData.exercises as bloque}
+						{@const bloquePhases = PHASES.map((p, i) => ({ ...p, i })).filter(p => p.bloque === bloque.name)}
+						<div class="dots-row">
+							{#if bloque.name}<span class="dots-label">{bloque.name}</span>{/if}
+							<div class="dots">
+								{#each bloquePhases as p}
+									<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {p.i < phase ? 'done' : ''} {p.i === phase && !inRoundBreak ? 'current' : ''}"></div>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<div class="dots">
+					{#each PHASES as p, i}
+						<div class="dot {p.type === 'pausa' ? 'is-pausa' : ''} {i < phase ? 'done' : ''} {i === phase && !inRoundBreak ? 'current' : ''}"></div>
+					{/each}
+				</div>
+			{/if}
 
 			<p class="next-info">{nextInfo}</p>
 
@@ -327,7 +382,10 @@
 	.bar.pausa       { background: #4ecdc4; }
 	.bar.round-break { background: #f59e0b; }
 	.bar.warning     { background: #ff6b35; }
-	.dots { display: flex; align-items: center; gap: 5px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; max-width: 340px; }
+	.dots-rutina { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; width: 100%; }
+	.dots-row { display: flex; align-items: center; gap: 8px; }
+	.dots-label { font-size: 0.65rem; color: #444; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; width: 80px; text-align: right; flex: none; }
+	.dots { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 	.dot { width: 10px; height: 10px; border-radius: 50%; background: #2a2a2a; transition: background 0.3s; }
 	.dot.done    { background: #4ade80; }
 	.dot.current { background: #fff; }

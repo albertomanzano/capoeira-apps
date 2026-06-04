@@ -20,8 +20,10 @@
 		return r ? `${m}m${r}s` : `${m}m`;
 	}
 
+	const isDescanso = (name: string) => /^descanso$/i.test(name.trim());
+
 	function totalExs(bloques: Bloque[]) {
-		return bloques.reduce((s, b) => s + b.exercises.length, 0);
+		return bloques.reduce((s, b) => s + b.exercises.filter(e => !isDescanso(e.name)).length, 0);
 	}
 
 	async function load() {
@@ -46,11 +48,11 @@
 		if (!selected) return;
 		busy = true;
 		const { data: { user } } = await supabase.auth.getUser();
-		const bloques = selected.exercises.map((b, bi) => ({
-			name: b.name,
-			exercises: b.exercises,
-			marks: marksByBloque[bi],
-		}));
+		const bloques = selected.exercises.map((b, bi) => {
+			const pairs = b.exercises.map((e, ei) => ({ e, mark: marksByBloque[bi][ei] }))
+				.filter(({ e }) => !isDescanso(e.name));
+			return { name: b.name, exercises: pairs.map(p => p.e), marks: pairs.map(p => p.mark) };
+		});
 		await supabase.from('training_logs').insert({
 			user_id:      user!.id,
 			routine_id:   selected.id,
@@ -86,20 +88,22 @@
 		{#each selected.exercises as bloque, bi}
 			<p class="bloque-label">{bloque.name || `Bloque ${bi + 1}`}</p>
 			{#each bloque.exercises as ex, ei}
-				<div class="ex-card">
-					<div class="ex-info">
-						<span class="ex-name">{ex.name}</span>
-						<span class="ex-dur">{fmt(ex.duration_s)}</span>
+				{#if !isDescanso(ex.name)}
+					<div class="ex-card">
+						<div class="ex-info">
+							<span class="ex-name">{ex.name}</span>
+							<span class="ex-dur">{fmt(ex.duration_s)}</span>
+						</div>
+						<input
+							type="number"
+							inputmode="numeric"
+							placeholder="—"
+							value={marksByBloque[bi]?.[ei] ?? ''}
+							oninput={(e) => setMark(bi, ei, e.currentTarget.value)}
+							class="mark-input"
+						/>
 					</div>
-					<input
-						type="number"
-						inputmode="numeric"
-						placeholder="—"
-						value={marksByBloque[bi]?.[ei] ?? ''}
-						oninput={(e) => setMark(bi, ei, e.currentTarget.value)}
-						class="mark-input"
-					/>
-				</div>
+				{/if}
 			{/each}
 		{/each}
 
