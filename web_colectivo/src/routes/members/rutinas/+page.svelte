@@ -248,8 +248,7 @@
 			<div class="routine-actions">
 				<button class="btn-play" onclick={(e) => { e.stopPropagation(); launchTimerRutina(r); }} title="Timer rutina completa">▶</button>
 				<button class="btn-icon" onclick={() => copyRoutine(r)} title="Copiar rutina">⎘</button>
-				<button class="btn-icon" onclick={() => goto(`/members/rutinas/${r.id}`)}>✎</button>
-				<button class="btn-icon danger" onclick={() => remove(r.id, r.name)}>✕</button>
+					<button class="btn-icon danger" onclick={() => remove(r.id, r.name)}>✕</button>
 			</div>
 		</div>
 		{#if expanded.has(r.id)}

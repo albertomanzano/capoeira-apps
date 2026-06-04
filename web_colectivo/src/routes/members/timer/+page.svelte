@@ -328,12 +328,6 @@
 		</div>
 
 	{:else}
-		{#if routineData}
-			<p class="routine-pill">▶ {routineData.name}</p>
-		{:else if routineBloque}
-			<p class="routine-pill">{routineBloque.name || 'Bloque'}</p>
-		{/if}
-
 		{#if !finished}
 			<div class="timer-wrap">
 				{#if inRoundBreak}
@@ -434,12 +428,7 @@
 		border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 0.95rem;
 	}
 
-	.routine-pill {
-		text-align: center; font-size: 0.78rem; color: #4ade80;
-		background: #0d1f0d; border: 1px solid #1a3a1a; border-radius: 20px;
-		padding: 4px 14px; margin: 0 auto 12px; width: fit-content;
-	}
-	.timer-wrap {
+.timer-wrap {
 		display: flex; flex-direction: column; align-items: center;
 		padding-top: 12px; text-align: center;
 	}

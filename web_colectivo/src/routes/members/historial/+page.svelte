@@ -2,7 +2,7 @@
 	import { supabase } from '$lib/supabase';
 	import Shell from '$lib/Shell.svelte';
 
-	type Ex       = { name: string; duration_s: number };
+	type Ex        = { name: string; duration_s: number };
 	type BloqueLog = { name: string; exercises: Ex[]; marks: (number | null)[] };
 	type Log = {
 		id: string; date: string; routine_name: string;
@@ -58,6 +58,21 @@
 		await load();
 	}
 
+	function setMark(log: Log, bi: number, ei: number, raw: string) {
+		if (!log.exercises[bi].marks) {
+			log.exercises[bi].marks = log.exercises[bi].exercises.map(() => null);
+		}
+		while (log.exercises[bi].marks.length <= ei) log.exercises[bi].marks.push(null);
+		log.exercises[bi].marks[ei] = raw ? Number(raw) : null;
+	}
+
+	async function saveMark(log: Log) {
+		await supabase
+			.from('training_logs')
+			.update({ exercises: log.exercises })
+			.eq('id', log.id);
+	}
+
 	$effect(() => { load(); });
 </script>
 
@@ -68,8 +83,8 @@
 		<p class="hint">Sin entrenamientos todavía.</p>
 	{:else}
 		{#each logs as log}
-			<div class="log-card" onclick={() => toggle(log.id)}>
-				<div class="log-header">
+			<div class="log-card">
+				<div class="log-header" onclick={() => toggle(log.id)}>
 					<span class="chevron">{expanded.has(log.id) ? '▾' : '▸'}</span>
 					<div class="log-meta">
 						<span class="log-date">{fmtDate(log.date)}</span>
@@ -91,7 +106,16 @@
 										<div class="log-ex">
 											<span class="log-ex-name">{ex.name}</span>
 											<span class="log-ex-dur">{fmt(ex.duration_s)}</span>
-											<span class="log-mark">{bloque.marks?.[ei] ?? '—'}</span>
+											<input
+												type="number"
+												inputmode="numeric"
+												placeholder="—"
+												value={bloque.marks?.[ei] ?? ''}
+												oninput={(e) => setMark(log, bi, ei, e.currentTarget.value)}
+												onblur={() => saveMark(log)}
+												onclick={(e) => e.stopPropagation()}
+												class="mark-edit"
+											/>
 										</div>
 									{/if}
 								{/each}
@@ -110,18 +134,18 @@
 
 	.log-card {
 		background: #1a1a1a; border-radius: 10px;
-		margin-bottom: 8px; cursor: pointer; overflow: hidden;
-		transition: background 0.15s;
+		margin-bottom: 8px; overflow: hidden;
 	}
-	.log-card:hover { background: #1e1e1e; }
 	.log-header {
 		display: flex; align-items: center; gap: 10px;
-		padding: 14px 16px;
+		padding: 14px 16px; cursor: pointer;
+		transition: background 0.15s;
 	}
+	.log-header:hover { background: #1e1e1e; }
 	.chevron { font-size: 0.75rem; color: #555; flex: none; }
 	.log-meta { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 	.log-date    { font-size: 0.72rem; color: #555; font-weight: 700; letter-spacing: 0.5px; }
-	.log-routine { font-size: 0.95rem; font-weight: 700; color: #ccc; }
+	.log-routine { font-size: 0.95rem; font-weight: 700; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.log-summary { font-size: 0.72rem; color: #444; flex: none; }
 	.btn-del {
 		background: none; border: none; color: #333; cursor: pointer;
@@ -142,7 +166,15 @@
 	}
 	.log-ex-name { flex: 1; color: #aaa; }
 	.log-ex-dur  { color: #444; font-size: 0.78rem; width: 40px; text-align: right; }
-	.log-mark    { color: #4ade80; font-weight: 700; width: 36px; text-align: right; }
+	.mark-edit {
+		width: 52px; text-align: center; font-size: 0.95rem; font-weight: 700;
+		padding: 4px 6px; border-radius: 6px; color: #4ade80;
+		background: #0f0f0f; border: 1px solid #2a2a2a;
+		-moz-appearance: textfield;
+	}
+	.mark-edit::-webkit-outer-spin-button,
+	.mark-edit::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+	.mark-edit:focus { border-color: #4ade80; outline: none; }
 
 	.hint { color: #333; text-align: center; padding: 40px 0; font-size: 0.9rem; }
 </style>
