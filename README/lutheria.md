@@ -36,11 +36,12 @@ luteria_app/
 **Pendiente**:
 - Build APK final y prueba en dispositivo tras los últimos cambios de estilo
 
-**Completado recientemente**:
+**Completado**:
 - Sounddevice funciona en Android (verificado en dispositivo)
-- Icono: logo del colectivo (`assets/icon.png`, 1024×1024, generado desde `logo.svg` con cairosvg)
-- Estilo: paleta crema/marrón de la web (ThemeMode.LIGHT, mismas variables que `paleta.md`)
-- Vista "Casar" descartada de momento
+- Icono: logo CCL (`assets/icon.png`, 1024×1024, convertido desde `web_colectivo/src/lib/assets/logo.svg` con cairosvg)
+- Estilo: paleta crema/marrón de la web (ThemeMode.LIGHT, mismas variables CSS que [paleta.md](paleta.md))
+- Pestañas con esquinas redondeadas (`border_radius=8`)
+- Vista "Casar" descartada
 
 ## Build Android
 
