@@ -7,10 +7,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from views.cabacas import cabacas_view
 from views.biribas import biribas_view
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
-MUTED   = "#666666"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+MUTED   = "#8a7060"
+TEXT    = "#2e1c0e"
 
 TABS = ["Cabaça", "Biriba", "Casar"]
 
@@ -37,7 +38,7 @@ def instrumentos_view(page: ft.Page) -> ft.Container:
             return ft.Container(
                 content=ft.Text(
                     label, size=13,
-                    color="#000000" if is_active else MUTED,
+                    color="#f5ede0" if is_active else MUTED,
                     weight=ft.FontWeight.BOLD if is_active else ft.FontWeight.NORMAL,
                     text_align=ft.TextAlign.CENTER,
                 ),

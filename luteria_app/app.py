@@ -2,16 +2,17 @@ import flet as ft
 from views import instrumentos_view, biblioteca_view, herramientas_view
 
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+TEXT    = "#2e1c0e"
 
 BIBLIOTECA_IDX = 1
 
 
 async def main(page: ft.Page):
     page.title = "Lutería"
-    page.theme_mode = ft.ThemeMode.DARK
+    page.theme_mode = ft.ThemeMode.LIGHT
     page.bgcolor = BG
     page.padding = 0
     page.window.width = 390

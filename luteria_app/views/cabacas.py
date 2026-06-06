@@ -11,10 +11,11 @@ from models import Cabaca
 from models.cabaca import freq_to_note
 from models.biblioteca import add_cabaca
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
-MUTED   = "#666666"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+MUTED   = "#8a7060"
+TEXT    = "#2e1c0e"
 
 _executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
 
@@ -39,8 +40,8 @@ def cabacas_view(page: ft.Page) -> ft.Container:
     )
 
     fH_text    = ft.Text("", size=32, color=ACCENT, weight=ft.FontWeight.BOLD)
-    note_text  = ft.Text("", size=18, color="white")
-    error_text = ft.Text("", size=13, color="#e57373")
+    note_text  = ft.Text("", size=18, color=TEXT)
+    error_text = ft.Text("", size=13, color="#8b2020")
 
     name_field = ft.TextField(
         label="Nombre",
@@ -49,27 +50,27 @@ def cabacas_view(page: ft.Page) -> ft.Container:
         border_color=MUTED, focused_border_color=ACCENT,
         expand=True,
     )
-    save_feedback = ft.Text("", size=12, color="#81c784")
+    save_feedback = ft.Text("", size=12, color="#2e6b3e")
     _current: dict = {}
 
     def _do_save():
         name = (name_field.value or "").strip()
         if not name or not _current:
             save_feedback.value = "Escribe un nombre primero"
-            save_feedback.color = "#e57373"
+            save_feedback.color = "#8b2020"
             page.update()
             return
         add_cabaca(name, _current['f_H'], _current['V_ml'], _current['d_mm'])
         name_field.value    = ""
         save_feedback.value = "✓ Guardado en biblioteca"
-        save_feedback.color = "#81c784"
+        save_feedback.color = "#2e6b3e"
         page.update()
 
     save_row = ft.Row(
         controls=[
             name_field,
             ft.ElevatedButton(
-                content=ft.Text("Guardar", color="#000000", weight=ft.FontWeight.BOLD),
+                content=ft.Text("Guardar", color="#f5ede0", weight=ft.FontWeight.BOLD),
                 bgcolor=ACCENT,
                 on_click=lambda e: _do_save(),
                 height=56,
@@ -112,8 +113,8 @@ def cabacas_view(page: ft.Page) -> ft.Container:
 
     # ── sección medir ─────────────────────────────────────────────────────────
     medir_status   = ft.Text("", size=12, color=MUTED)
-    medir_fH_text  = ft.Text("", size=32, color="#4fc3f7", weight=ft.FontWeight.BOLD)
-    medir_note_text = ft.Text("", size=18, color="white")
+    medir_fH_text  = ft.Text("", size=32, color=ACCENT, weight=ft.FontWeight.BOLD)
+    medir_note_text = ft.Text("", size=18, color=TEXT)
     medir_cmp_text  = ft.Text("", size=12, color=MUTED)
 
     medir_name_field = ft.TextField(
@@ -123,28 +124,28 @@ def cabacas_view(page: ft.Page) -> ft.Container:
         border_color=MUTED, focused_border_color=ACCENT,
         expand=True,
     )
-    medir_save_feedback = ft.Text("", size=12, color="#81c784")
+    medir_save_feedback = ft.Text("", size=12, color="#2e6b3e")
     _medir_current: dict = {}
 
     def _do_medir_save():
         name = (medir_name_field.value or "").strip()
         if not name or not _medir_current:
             medir_save_feedback.value = "Escribe un nombre primero"
-            medir_save_feedback.color = "#e57373"
+            medir_save_feedback.color = "#8b2020"
             page.update()
             return
         add_cabaca(name, _medir_current['f_H'],
                    _medir_current['V_ml'], _medir_current['d_mm'])
         medir_name_field.value      = ""
         medir_save_feedback.value   = "✓ Guardado en biblioteca"
-        medir_save_feedback.color   = "#81c784"
+        medir_save_feedback.color   = "#2e6b3e"
         page.update()
 
     medir_save_row = ft.Row(
         controls=[
             medir_name_field,
             ft.ElevatedButton(
-                content=ft.Text("Guardar", color="#000000", weight=ft.FontWeight.BOLD),
+                content=ft.Text("Guardar", color="#f5ede0", weight=ft.FontWeight.BOLD),
                 bgcolor=ACCENT,
                 on_click=lambda e: _do_medir_save(),
                 height=56,
@@ -168,7 +169,7 @@ def cabacas_view(page: ft.Page) -> ft.Container:
     )
 
     medir_btn = ft.ElevatedButton(
-        content=ft.Text("Medir resonancia", color="#000000", weight=ft.FontWeight.BOLD),
+        content=ft.Text("Medir resonancia", color="#f5ede0", weight=ft.FontWeight.BOLD),
         bgcolor=ACCENT,
         width=300,
     )
@@ -185,8 +186,8 @@ def cabacas_view(page: ft.Page) -> ft.Container:
         from audio.tono import generate_chirp
 
         _running[0] = True
-        medir_btn.content = ft.Text("Detener", color="white", weight=ft.FontWeight.BOLD)
-        medir_btn.bgcolor = "#e57373"
+        medir_btn.content = ft.Text("Detener", color="#f5ede0", weight=ft.FontWeight.BOLD)
+        medir_btn.bgcolor = "#8b2020"
         medir_result_col.visible    = False
         medir_save_feedback.value   = ""
         page.update()
@@ -252,14 +253,14 @@ def cabacas_view(page: ft.Page) -> ft.Container:
 
             medir_result_col.visible = True
             medir_status.value = "Medición completa"
-            medir_status.color = "#81c784"
+            medir_status.color = "#2e6b3e"
 
         except Exception as exc:
             medir_status.value = f"Error: {exc}"
-            medir_status.color = "#e57373"
+            medir_status.color = "#8b2020"
         finally:
             _running[0] = False
-            medir_btn.content = ft.Text("Medir resonancia", color="#000000",
+            medir_btn.content = ft.Text("Medir resonancia", color="#f5ede0",
                                         weight=ft.FontWeight.BOLD)
             medir_btn.bgcolor = ACCENT
             page.update()
@@ -276,14 +277,14 @@ def cabacas_view(page: ft.Page) -> ft.Container:
     return ft.Container(
         content=ft.Column(
             controls=[
-                ft.Text("Cabaça", size=24, weight=ft.FontWeight.BOLD, color="white"),
+                ft.Text("Cabaça", size=24, weight=ft.FontWeight.BOLD, color=TEXT),
                 ft.Text("Estimación por dimensiones", size=13, color=MUTED),
                 ft.Container(height=8),
                 v_field,
                 d_field,
                 error_text,
                 ft.ElevatedButton(
-                    content=ft.Text("Calcular", color="#000000", weight=ft.FontWeight.BOLD),
+                    content=ft.Text("Calcular", color="#f5ede0", weight=ft.FontWeight.BOLD),
                     bgcolor=ACCENT,
                     on_click=calculate,
                     width=300,
@@ -291,7 +292,7 @@ def cabacas_view(page: ft.Page) -> ft.Container:
                 result_col,
                 ft.Divider(color=SURFACE),
                 ft.Text("Medir resonancia", size=18, weight=ft.FontWeight.BOLD,
-                        color="white"),
+                        color=TEXT),
                 ft.Text(
                     "Apunta el altavoz hacia la boca de la cabaça (~5 cm).\n"
                     "El micrófono grabará la resonancia.",

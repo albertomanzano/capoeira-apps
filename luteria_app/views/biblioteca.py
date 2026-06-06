@@ -11,17 +11,18 @@ from models.biblioteca import (delete_cabaca, delete_biriba, delete_arame,
 from models.biriba import Biriba
 from models.cabaca import freq_to_note
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
-MUTED   = "#666666"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+MUTED   = "#8a7060"
+TEXT    = "#2e1c0e"
 CALIBRES = ['0.7mm', '0.8mm', '0.9mm', '1.0mm']
 
 
 def _tf(label, value, numeric=False, width=None):
     kw = dict(
         label=label, value=str(value),
-        filled=True, fill_color="#222222",
+        filled=True, fill_color=SURFACE,
         border_color=MUTED, focused_border_color=ACCENT,
     )
     if numeric:
@@ -50,7 +51,7 @@ def _edit_cabaca_dialog(page, idx, entry, on_saved):
     fH_f   = _tf("f_H (Hz)", entry['f_H'], numeric=True)
     v_f    = _tf("Volumen V (ml)", entry.get('V_ml', ''), numeric=True)
     d_f    = _tf("Diámetro d (mm)", entry.get('d_mm', ''), numeric=True)
-    err_t  = ft.Text("", color="#e57373", size=12)
+    err_t  = ft.Text("", color="#8b2020", size=12)
 
     def do_save(e):
         try:
@@ -74,7 +75,7 @@ def _edit_cabaca_dialog(page, idx, entry, on_saved):
         page.update()
 
     dlg = ft.AlertDialog(
-        title=ft.Text("Editar cabaça", color="white"),
+        title=ft.Text("Editar cabaça", color=TEXT),
         content=ft.Column(
             [name_f, fH_f, v_f, d_f, err_t],
             tight=True, spacing=10, width=300,
@@ -82,7 +83,7 @@ def _edit_cabaca_dialog(page, idx, entry, on_saved):
         actions=[
             ft.TextButton("Cancelar", on_click=do_cancel),
             ft.ElevatedButton(
-                content=ft.Text("Guardar", color="#000000", weight=ft.FontWeight.BOLD),
+                content=ft.Text("Guardar", color="#f5ede0", weight=ft.FontWeight.BOLD),
                 bgcolor=ACCENT, on_click=do_save,
             ),
         ],
@@ -103,11 +104,11 @@ def _edit_biriba_dialog(page, idx, entry, on_saved):
         label="Calibre",
         options=[ft.dropdown.Option(c) for c in CALIBRES],
         value=entry['calibre'],
-        filled=True, fill_color="#222222",
+        filled=True, fill_color=SURFACE,
         border_color=MUTED, focused_border_color=ACCENT,
     )
     f1_f    = _tf("f₁ medida (Hz)", entry['f1_measured'], numeric=True)
-    err_t   = ft.Text("", color="#e57373", size=12)
+    err_t   = ft.Text("", color="#8b2020", size=12)
 
     def do_save(e):
         try:
@@ -134,7 +135,7 @@ def _edit_biriba_dialog(page, idx, entry, on_saved):
         page.update()
 
     dlg = ft.AlertDialog(
-        title=ft.Text("Editar biriba", color="white"),
+        title=ft.Text("Editar biriba", color=TEXT),
         content=ft.Column(
             [name_f, L0_f, L_f, cal_dd, f1_f, err_t],
             tight=True, spacing=10, width=300,
@@ -142,7 +143,7 @@ def _edit_biriba_dialog(page, idx, entry, on_saved):
         actions=[
             ft.TextButton("Cancelar", on_click=do_cancel),
             ft.ElevatedButton(
-                content=ft.Text("Guardar", color="#000000", weight=ft.FontWeight.BOLD),
+                content=ft.Text("Guardar", color="#f5ede0", weight=ft.FontWeight.BOLD),
                 bgcolor=ACCENT, on_click=do_save,
             ),
         ],
@@ -164,7 +165,7 @@ def _cabaca_card(entry, idx, page, on_change) -> ft.Container:
             controls=[
                 ft.Column(
                     controls=[
-                        ft.Text(entry['name'], size=14, color="white",
+                        ft.Text(entry['name'], size=14, color=TEXT,
                                 weight=ft.FontWeight.W_500),
                         ft.Text(f"{entry['f_H']:.1f} Hz  ·  {note}  ·  {entry['date']}",
                                 size=11, color=MUTED),
@@ -197,7 +198,7 @@ def _biriba_card(entry, idx, page, on_change) -> ft.Container:
             controls=[
                 ft.Column(
                     controls=[
-                        ft.Text(entry['name'], size=14, color="white",
+                        ft.Text(entry['name'], size=14, color=TEXT,
                                 weight=ft.FontWeight.W_500),
                         ft.Text(
                             f"k={entry['k']:.0f} N/m  ·  {rng}"
@@ -252,7 +253,7 @@ def _edit_arame_dialog(page, idx, entry, on_saved):
     cal_f   = _tf("Calibre", entry.get('calibre', ''))
     mu_f    = _tf("μ (g/m)", f"{entry['mu']*1000:.3f}", numeric=True)
     mat_f   = _tf("Material", entry.get('material', ''))
-    err_t   = ft.Text("", color="#e57373", size=12)
+    err_t   = ft.Text("", color="#8b2020", size=12)
 
     def do_save(e):
         try:
@@ -278,7 +279,7 @@ def _edit_arame_dialog(page, idx, entry, on_saved):
         page.update()
 
     dlg = ft.AlertDialog(
-        title=ft.Text("Editar arame", color="white"),
+        title=ft.Text("Editar arame", color=TEXT),
         content=ft.Column(
             [name_f, brand_f, cal_f, mu_f, mat_f, err_t],
             tight=True, spacing=10, width=300,
@@ -286,7 +287,7 @@ def _edit_arame_dialog(page, idx, entry, on_saved):
         actions=[
             ft.TextButton("Cancelar", on_click=do_cancel),
             ft.ElevatedButton(
-                content=ft.Text("Guardar", color="#000000", weight=ft.FontWeight.BOLD),
+                content=ft.Text("Guardar", color="#f5ede0", weight=ft.FontWeight.BOLD),
                 bgcolor=ACCENT, on_click=do_save,
             ),
         ],
@@ -307,7 +308,7 @@ def _arame_card(entry, idx, page, on_change) -> ft.Container:
             controls=[
                 ft.Column(
                     controls=[
-                        ft.Text(entry['name'], size=14, color="white",
+                        ft.Text(entry['name'], size=14, color=TEXT,
                                 weight=ft.FontWeight.W_500),
                         ft.Text(label.strip('  ·  '), size=11, color=MUTED),
                     ],
@@ -364,7 +365,7 @@ def biblioteca_view(page: ft.Page) -> tuple:
     container = ft.Container(
         content=ft.Column(
             controls=[
-                ft.Text("Biblioteca", size=24, weight=ft.FontWeight.BOLD, color="white"),
+                ft.Text("Biblioteca", size=24, weight=ft.FontWeight.BOLD, color=TEXT),
                 ft.Container(height=8),
                 ft.Text("ARAMES", size=11, color=MUTED, weight=ft.FontWeight.BOLD),
                 ft.Container(height=2),

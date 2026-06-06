@@ -10,10 +10,11 @@ from audio.espectro import (GROUP_COLORS, process_and_plot, record_audio,
                              scale_color)
 from audio.android_audio import MicPermissionError, open_app_settings
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
-MUTED   = "#666666"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+MUTED   = "#8a7060"
+TEXT    = "#2e1c0e"
 
 _executor = concurrent.futures.ThreadPoolExecutor(max_workers=2)
 
@@ -37,7 +38,7 @@ def _fundamental_card(groups) -> ft.Container:
                                 weight=ft.FontWeight.BOLD),
                         ft.Text(note, size=48, color=color,
                                 weight=ft.FontWeight.BOLD),
-                        ft.Text(f"{f0:.1f} Hz", size=16, color="white"),
+                        ft.Text(f"{f0:.1f} Hz", size=16, color=TEXT),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     spacing=2,
@@ -83,7 +84,7 @@ def espectro_view(page: ft.Page) -> ft.Container:
     result_area = ft.Column([], horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             spacing=6)
     record_btn  = ft.ElevatedButton(
-        content=ft.Text("Grabar", color="#000000", weight=ft.FontWeight.BOLD),
+        content=ft.Text("Grabar", color="#f5ede0", weight=ft.FontWeight.BOLD),
         bgcolor=ACCENT, width=200,
     )
     async def do_record():
@@ -105,7 +106,7 @@ def espectro_view(page: ft.Page) -> ft.Container:
             total_amp = sum(a for g in groups for _, a, _ in g)
             if not groups or total_amp == 0:
                 status_text.value = "No se detectó señal. Percute el instrumento e intenta de nuevo."
-                status_text.color = "#e57373"
+                status_text.color = "#8b2020"
                 record_btn.disabled = False
                 page.update()
                 return
@@ -121,10 +122,10 @@ def espectro_view(page: ft.Page) -> ft.Container:
             status_text.color   = MUTED
         except MicPermissionError:
             status_text.value = "Permiso de micrófono no concedido."
-            status_text.color = "#e57373"
+            status_text.color = "#8b2020"
             result_area.controls = [
                 ft.ElevatedButton(
-                    content=ft.Text("Abrir ajustes de permisos", color="#000000",
+                    content=ft.Text("Abrir ajustes de permisos", color="#f5ede0",
                                     weight=ft.FontWeight.BOLD),
                     bgcolor=ACCENT,
                     on_click=lambda e: open_app_settings(),
@@ -132,7 +133,7 @@ def espectro_view(page: ft.Page) -> ft.Container:
             ]
         except Exception as exc:
             status_text.value = f"Error: {exc}"
-            status_text.color = "#e57373"
+            status_text.color = "#8b2020"
         finally:
             record_btn.disabled = False
         page.update()
@@ -143,7 +144,7 @@ def espectro_view(page: ft.Page) -> ft.Container:
         content=ft.Column(
             controls=[
                 ft.Text("Analizador de espectro", size=24,
-                        weight=ft.FontWeight.BOLD, color="white"),
+                        weight=ft.FontWeight.BOLD, color=TEXT),
                 ft.Text("Captura 3 segundos del micrófono", size=13, color=MUTED),
                 ft.Container(height=8),
                 record_btn,

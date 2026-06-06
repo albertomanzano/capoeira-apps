@@ -7,10 +7,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from audio.tono import TonePlayer
 from models.cabaca import freq_to_note
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
-MUTED   = "#666666"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+MUTED   = "#8a7060"
+TEXT    = "#2e1c0e"
 
 F_MIN, F_MAX = 50, 1000
 
@@ -19,7 +20,7 @@ def tono_view(page: ft.Page) -> ft.Container:
     player = TonePlayer()
 
     freq_display = ft.Text("440 Hz", size=36, color=ACCENT, weight=ft.FontWeight.BOLD)
-    note_display = ft.Text(freq_to_note(440), size=18, color="white")
+    note_display = ft.Text(freq_to_note(440), size=18, color=TEXT)
 
     slider = ft.Slider(
         value=440, min=F_MIN, max=F_MAX, divisions=950,
@@ -37,7 +38,7 @@ def tono_view(page: ft.Page) -> ft.Container:
     )
 
     play_btn = ft.ElevatedButton(
-        content=ft.Text("Reproducir", color="#000000", weight=ft.FontWeight.BOLD),
+        content=ft.Text("Reproducir", color="#f5ede0", weight=ft.FontWeight.BOLD),
         bgcolor=ACCENT, width=200,
     )
 
@@ -69,12 +70,12 @@ def tono_view(page: ft.Page) -> ft.Container:
     def on_play_stop(e):
         if player.stream:
             player.stop()
-            play_btn.content = ft.Text("Reproducir", color="#000000", weight=ft.FontWeight.BOLD)
+            play_btn.content = ft.Text("Reproducir", color="#f5ede0", weight=ft.FontWeight.BOLD)
             play_btn.bgcolor = ACCENT
         else:
             player.start(slider.value)
-            play_btn.content = ft.Text("Detener", color="white", weight=ft.FontWeight.BOLD)
-            play_btn.bgcolor = "#e57373"
+            play_btn.content = ft.Text("Detener", color="#f5ede0", weight=ft.FontWeight.BOLD)
+            play_btn.bgcolor = "#8b2020"
         page.update()
 
     slider.on_change   = on_slider_change
@@ -84,7 +85,7 @@ def tono_view(page: ft.Page) -> ft.Container:
     return ft.Container(
         content=ft.Column(
             controls=[
-                ft.Text("Generador de tono", size=24, weight=ft.FontWeight.BOLD, color="white"),
+                ft.Text("Generador de tono", size=24, weight=ft.FontWeight.BOLD, color=TEXT),
                 ft.Text("Tono sinusoidal puro", size=13, color=MUTED),
                 ft.Container(height=16),
                 freq_display,

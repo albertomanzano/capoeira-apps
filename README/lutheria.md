@@ -1,6 +1,6 @@
 # App de luthería
 
-App descargable desde `/members/descargas/` en la [web](web.md). Mide y casa cabaças con biribas usando modelos acústicos basados en la [física del berimbau](fisica.md).
+App descargable desde `/members/descargas/` en la [web](web.md). Mide y casa cabaças con biribas usando modelos acústicos basados en la [física del berimbau](berimbau_fisica.md) y del [atabaque](atabaque_fisica.md).
 
 Stack: Python + Flet 0.84.0 + sounddevice + numpy.
 Virtualenv: `atabaque_venv/` (raíz del proyecto). Ver [convenciones](convenciones.md).
@@ -34,9 +34,13 @@ luteria_app/
 **Completo**: cabaças (calcular + medir resonancia), biribas (k + curva f₁(L)), biblioteca (arames/cabaças/biribas), tono, espectro.
 
 **Pendiente**:
-- Vista "Casar": matching cabaça ↔ biriba con superposición de curvas f₁(L) + f_H
-- Verificar sounddevice en Android (depende de PortAudio)
-- Build APK final y prueba en dispositivo
+- Build APK final y prueba en dispositivo tras los últimos cambios de estilo
+
+**Completado recientemente**:
+- Sounddevice funciona en Android (verificado en dispositivo)
+- Icono: logo del colectivo (`assets/icon.png`, 1024×1024, generado desde `logo.svg` con cairosvg)
+- Estilo: paleta crema/marrón de la web (ThemeMode.LIGHT, mismas variables que `paleta.md`)
+- Vista "Casar" descartada de momento
 
 ## Build Android
 

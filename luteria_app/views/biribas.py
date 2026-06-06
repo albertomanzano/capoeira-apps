@@ -17,10 +17,11 @@ from models.biblioteca import add_biriba, get_arames
 
 from audio.espectro import detect_f1, record_audio
 
-ACCENT  = "#f0a500"
-BG      = "#0d0d0d"
-SURFACE = "#1a1a1a"
-MUTED   = "#666666"
+ACCENT  = "#5e4040"
+BG      = "#f5ede0"
+SURFACE = "#ece4d3"
+MUTED   = "#8a7060"
+TEXT    = "#2e1c0e"
 
 NOTE_PURE = {'Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si'}
 
@@ -45,39 +46,38 @@ def _plot_curve(biriba: Biriba) -> str:
     f_max = float(freqs[valid].max())
     pad   = (f_max - f_min) * 0.06
 
-    plt.style.use('dark_background')
-    fig, ax = plt.subplots(figsize=(7, 3.8), facecolor='#0d0d0d')
-    ax.set_facecolor('#111111')
+    fig, ax = plt.subplots(figsize=(7, 3.8), facecolor='#f5ede0')
+    ax.set_facecolor('#ece4d3')
 
     ax.plot(L_cm[valid], freqs[valid], color=ACCENT, linewidth=2.0)
     ax.scatter([biriba.L * 100], [biriba.f1_measured],
-               color='white', s=55, zorder=5, label=f"{biriba.f1_measured:.0f} Hz")
+               color='#2e1c0e', s=55, zorder=5, label=f"{biriba.f1_measured:.0f} Hz")
     ax.set_ylim(f_min - pad, f_max + pad)
 
     note_data = _notes_in_range(f_min, f_max)
     if note_data:
         for f_note, _ in note_data:
-            ax.axhline(f_note, color='#2a2a2a', linewidth=0.8, linestyle='--')
+            ax.axhline(f_note, color='#cec0af', linewidth=0.8, linestyle='--')
         ax2 = ax.twinx()
         ax2.set_ylim(ax.get_ylim())
         ax2.set_yticks([f for f, _ in note_data])
         ax2.set_yticklabels([n for _, n in note_data], fontsize=7)
-        ax2.tick_params(colors='#666', labelsize=7, length=0)
+        ax2.tick_params(colors='#8a7060', labelsize=7, length=0)
         for spine in ax2.spines.values():
-            spine.set_edgecolor('#333')
+            spine.set_edgecolor('#cec0af')
 
-    ax.set_xlabel('L (cm)', color='#aaa', fontsize=9)
-    ax.set_ylabel('f₁ (Hz)', color='#aaa', fontsize=9)
-    ax.tick_params(colors='#666', labelsize=8)
+    ax.set_xlabel('L (cm)', color='#8a7060', fontsize=9)
+    ax.set_ylabel('f₁ (Hz)', color='#8a7060', fontsize=9)
+    ax.tick_params(colors='#8a7060', labelsize=8)
     for spine in ax.spines.values():
-        spine.set_edgecolor('#333')
-    ax.grid(True, color='#1a1a1a', linewidth=0.5)
-    ax.legend(fontsize=7, labelcolor='white', framealpha=0.2,
+        spine.set_edgecolor('#cec0af')
+    ax.grid(True, color='#e3daca', linewidth=0.5)
+    ax.legend(fontsize=7, labelcolor='#2e1c0e', framealpha=0.4,
               loc='upper right', markerscale=0.8)
     plt.tight_layout(pad=1.0)
 
     buf = io.BytesIO()
-    fig.savefig(buf, format='png', dpi=120, facecolor='#0d0d0d')
+    fig.savefig(buf, format='png', dpi=120, facecolor='#f5ede0')
     plt.close(fig)
     buf.seek(0)
     return buf.read()
@@ -141,12 +141,12 @@ def biribas_view(page: ft.Page) -> ft.Container:
     )
 
     status_text = ft.Text("", size=13, color=MUTED)
-    error_text  = ft.Text("", size=13, color="#e57373")
+    error_text  = ft.Text("", size=13, color="#8b2020")
     result_area = ft.Column([], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=8)
     _current: dict = {}
 
     measure_btn = ft.ElevatedButton(
-        content=ft.Text("Medir percusión", color="#000000", weight=ft.FontWeight.BOLD),
+        content=ft.Text("Medir percusión", color="#f5ede0", weight=ft.FontWeight.BOLD),
         bgcolor=ACCENT, width=300,
     )
 
@@ -158,12 +158,12 @@ def biribas_view(page: ft.Page) -> ft.Container:
         border_color=MUTED, focused_border_color=ACCENT,
         expand=True,
     )
-    save_feedback = ft.Text("", size=12, color="#81c784")
+    save_feedback = ft.Text("", size=12, color="#2e6b3e")
     save_row = ft.Row(
         controls=[
             name_field,
             ft.ElevatedButton(
-                content=ft.Text("Guardar", color="#000000", weight=ft.FontWeight.BOLD),
+                content=ft.Text("Guardar", color="#f5ede0", weight=ft.FontWeight.BOLD),
                 bgcolor=ACCENT,
                 on_click=lambda e: _do_save(),
                 height=56,
@@ -176,7 +176,7 @@ def biribas_view(page: ft.Page) -> ft.Container:
         name = (name_field.value or "").strip()
         if not name or not _current:
             save_feedback.value = "Escribe un nombre primero"
-            save_feedback.color = "#e57373"
+            save_feedback.color = "#8b2020"
             page.update()
             return
         add_biriba(name, _current['k'], _current['L0_cm'], _current['L_cm'],
@@ -184,7 +184,7 @@ def biribas_view(page: ft.Page) -> ft.Container:
                    mu=_current.get('mu'), arame_name=_current.get('arame_name'))
         name_field.value    = ""
         save_feedback.value = "✓ Guardado en biblioteca"
-        save_feedback.color = "#81c784"
+        save_feedback.color = "#2e6b3e"
         page.update()
 
     async def do_measure():
@@ -271,7 +271,7 @@ def biribas_view(page: ft.Page) -> ft.Container:
                         ft.Column(
                             controls=[
                                 ft.Text("f₁ medida", size=11, color=MUTED),
-                                ft.Text(f"{f1:.1f} Hz", size=26, color="white",
+                                ft.Text(f"{f1:.1f} Hz", size=26, color=TEXT,
                                         weight=ft.FontWeight.BOLD),
                                 ft.Text(note_f1, size=13, color=MUTED),
                             ],
@@ -281,7 +281,7 @@ def biribas_view(page: ft.Page) -> ft.Container:
                         ft.Column(
                             controls=[
                                 ft.Text("rango", size=11, color=MUTED),
-                                ft.Text(f"{note_lo} – {note_hi}", size=18, color="white",
+                                ft.Text(f"{note_lo} – {note_hi}", size=18, color=TEXT,
                                         weight=ft.FontWeight.BOLD),
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -311,7 +311,7 @@ def biribas_view(page: ft.Page) -> ft.Container:
     return ft.Container(
         content=ft.Column(
             controls=[
-                ft.Text("Biriba", size=24, weight=ft.FontWeight.BOLD, color="white"),
+                ft.Text("Biriba", size=24, weight=ft.FontWeight.BOLD, color=TEXT),
                 ft.Text("Caracteriza una biriba midiendo k", size=13, color=MUTED),
                 ft.Container(height=8),
                 L0_field,
