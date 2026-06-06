@@ -142,12 +142,12 @@
 		busy = false;
 	}
 
-	async function copyRoutine(r: Routine) {
-		const { data: { user } } = await supabase.auth.getUser();
-		await supabase.from('routines').insert({
-			user_id: user!.id, name: `${r.name} (copia)`, exercises: r.exercises
-		});
-		await load();
+	function copyRoutine(r: Routine) {
+		newName    = r.name + ' (copia)';
+		newBloques = r.exercises.map(cloneBloque);
+		creating   = true;
+		error      = '';
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	async function remove(id: string, name: string) {

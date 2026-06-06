@@ -5,7 +5,7 @@
 
 <div class="shell">
 	<div class="topbar">
-		<img src={logo} alt="Capoeira Colectiva" class="logo" />
+		<a href="/"><img src={logo} alt="Capoeira Colectiva" class="logo" /></a>
 		<div class="topbar-right">
 			<a href="/members/descargas" class="top-link" class:active={tab === 'descargas'}>⬇</a>
 			<a href="/members/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Ajustes">⚙</a>
@@ -44,8 +44,8 @@
 	.logo { height: 100px; width: auto; }
 	.topbar-right { display: flex; align-items: center; gap: 14px; }
 	.top-link {
-		color: #444; font-size: 0.85rem; text-decoration: none;
-		transition: color 0.15s;
+		color: #444; font-size: 1.6rem; text-decoration: none;
+		transition: color 0.15s; line-height: 1; padding: 4px;
 	}
 	.top-link.active { color: var(--accent); }
 	.top-link:hover  { color: #888; }

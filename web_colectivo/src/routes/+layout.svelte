@@ -7,11 +7,13 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<link rel="preconnect" href="https://fonts.googleapis.com"/>
+	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet"/>
 </svelte:head>
 
 <style>
 	:global(:root) {
-		--accent:        #5c3318;
+		--accent:        #5e4040;
 		--accent-on:     #f5ede0;
 		--text:          #2e1c0e;
 		--bg:            #f5ede0;
@@ -20,6 +22,7 @@
 		--border:        #cec0af;
 	}
 	:global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+
 	:global(body) {
 		font-family: system-ui, sans-serif;
 		background: var(--bg);
