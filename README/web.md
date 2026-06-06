@@ -112,7 +112,7 @@ Un ejercicio llamado "Descanso" (insensible a mayúsculas) se trata como pausa e
 - **Historial**: agrupado por rutina. Cada grupo muestra nº de sesiones y fecha más reciente, ordenado por sesión más reciente arriba. Al desplegar un grupo aparecen las sesiones (fecha + resumen); al pulsar una sesión se navega a `/historial/[id]`. Botón "+ Añadir" para registrar una sesión manualmente sin pasar por el timer.
   - `/historial/[id]`: detalle con marcas editables (guardado onblur) y botón de borrar.
   - `/historial/nueva`: elegir rutina + fecha + rellenar marcas → guarda en `training_logs`.
-- **Descargas**: APK de luthería (requiere login)
+- **Descargas**: APK de luthería (requiere login). URL configurada en `descargas/+page.svelte` → ver [lutheria.md](lutheria.md) para el historial de releases.
 - **Perfil** (`mi-perfil`): nombre, cambiar contraseña, selector de voz preferida, logout.
 
 ## Compatibilidad datos antiguos
