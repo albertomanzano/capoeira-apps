@@ -13,20 +13,11 @@ SURFACE = "#ece4d3"
 MUTED   = "#8a7060"
 TEXT    = "#2e1c0e"
 
-TABS = ["Cabaça", "Biriba", "Casar"]
-
-
-def _casar_placeholder() -> ft.Container:
-    return ft.Container(
-        content=ft.Text("Casar — en construcción", size=16, color=MUTED),
-        alignment=ft.alignment.Alignment(0, 0),
-        expand=True,
-        bgcolor=BG,
-    )
+TABS = ["Cabaça", "Biriba"]
 
 
 def instrumentos_view(page: ft.Page) -> ft.Container:
-    sub_views = [cabacas_view(page), biribas_view(page), _casar_placeholder()]
+    sub_views = [cabacas_view(page), biribas_view(page)]
     active = [0]
 
     content = ft.Container(content=sub_views[0], expand=True)
