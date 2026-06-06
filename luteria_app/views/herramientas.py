@@ -34,6 +34,7 @@ def herramientas_view(page: ft.Page) -> ft.Container:
                     text_align=ft.TextAlign.CENTER,
                 ),
                 bgcolor=ACCENT if is_active else SURFACE,
+                border_radius=8,
                 padding=ft.padding.symmetric(vertical=11),
                 on_click=lambda e, i=idx: switch(i),
                 expand=True,
