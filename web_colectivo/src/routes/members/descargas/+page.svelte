@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Shell from '$lib/Shell.svelte';
-	const LUTERIA_APK = 'https://github.com/albertomanzano/capoeira-apps/releases/download/v1.0-luteria/lutheria.apk';
+	const LUTERIA_APK = 'https://github.com/albertomanzano/capoeira-apps/releases/download/v1.1-luteria/lutheria.apk';
 </script>
 
 <svelte:head>
@@ -15,7 +15,7 @@
 			<div class="card-body">
 				<h2>App de luthería</h2>
 				<p>Mide y casa cabaças con biribas. Calcula la frecuencia de Helmholtz y encuentra la biriba compatible.</p>
-				<div class="meta">Android · Python/Flet · v1.0</div>
+				<div class="meta">Android · Python/Flet · v1.1</div>
 			</div>
 			<a href={LUTERIA_APK} class="btn-download" download>
 				Descargar APK
