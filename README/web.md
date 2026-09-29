@@ -3,7 +3,7 @@
 Stack: SvelteKit 5 (Svelte 5 runes: `$state`, `$derived`, `$effect`) + [Supabase](supabase.md) + Cloudflare Pages.
 
 **Nombre del colectivo**: Colectivo Capoeira Libre
-**URL producción**: https://capoeira-colectiva.pages.dev
+**URL producción**: https://colectivocapoeiralibre.es (dominio propio, comprado en Hostinger) — también sigue activo https://capoeira-colectiva.pages.dev
 **Dev local**: `cd web_colectivo && npm run dev` → localhost:5173
 **Deploy**: `cd web_colectivo && npm run build && wrangler pages deploy build --project-name=capoeira-colectiva --branch=main --commit-dirty=true`
 
@@ -15,6 +15,14 @@ Sigue las [convenciones](convenciones.md) generales del proyecto.
 - `static/_redirects`: contiene `/* /index.html 200` para que SvelteKit maneje el routing client-side
 - Supabase Auth: en el dashboard del proyecto → Authentication → URL Configuration, Site URL y Redirect URLs deben incluir `https://capoeira-colectiva.pages.dev/**`
 - `login/+page.svelte`: el `redirectTo` del reset de contraseña apunta a `https://capoeira-colectiva.pages.dev/reset-password`
+
+### Dominio propio (colectivocapoeiralibre.es)
+
+Comprado por Alberto en Hostinger; el DNS se gestiona en Cloudflare (nameservers del dominio cambiados a `clara.ns.cloudflare.com` / `elmo.ns.cloudflare.com`, registro sigue en Hostinger). Añadido como Custom Domain en el proyecto Pages (Workers & Pages → capoeira-colectiva → Custom domains).
+
+`wrangler` no tiene comando para gestionar Custom Domains de Pages — se hace desde el dashboard. Nota: el flujo de "Cloudflare Registrar" (transferir el registro del dominio a Cloudflare) no soporta `.es`, pero eso es independiente de usar Cloudflare solo como DNS + Pages, que sí funciona.
+
+Pendiente: añadir `www.colectivocapoeiralibre.es` como Custom Domain también si se quiere que funcione con "www". Actualizar Site URL / Redirect URLs en Supabase Auth y el `redirectTo` del reset de contraseña cuando se decida cuál es el dominio canónico.
 
 ## Estructura de rutas
 
@@ -34,10 +42,13 @@ Sigue las [convenciones](convenciones.md) generales del proyecto.
     /mi-perfil           — nombre + cambiar contraseña + selector de voz + logout
 ```
 
-**Navegación pública**: `PublicNav` con grid de 3 columnas — izquierda vacía · "Universo Colectivo" centrado · "Entrar/Miembros" a la derecha. En páginas `/universo/*` el link central cambia a "Home".
-**Navegación members**: Rutinas / Historial (tabbar) + ⬇ Descargas + ⚙ Perfil (topbar). El logo en la topbar lleva a `/`.
+**Navegación pública**: `PublicNav` con grid de 3 columnas — izquierda vacía · "Universo Colectivo" centrado · derecha vacía. En páginas `/universo/*` el link central cambia a "Home".
 
-La `/` ya no redirige a `/members` si el usuario está autenticado — muestra la landing y el navbar cambia "Entrar" por "Miembros".
+**Members está oculto de la navegación** (2026-09): nadie lo usaba. Se quitó el botón "Entrar/Miembros" de `PublicNav` y el icono ⬇ Descargas de `Shell.svelte`. El código y las rutas (`/login`, `/registro`, `/members/*`) siguen en el repo por si se retoma; solo dejaron de tener un enlace visible desde la web pública.
+
+**Navegación members** (si se navega directamente a `/members/...`): Rutinas / Historial (tabbar) + ⚙ Perfil (topbar). El logo en la topbar lleva a `/`.
+
+El `+layout.svelte` raíz ya no bloquea el render de toda la web esperando la comprobación de sesión de Supabase (`loading` store) — solo `members/+layout.svelte` sigue haciendo esa espera, porque solo esa sección necesita saber si hay usuario logueado.
 
 ## Landing pública — diseño
 
