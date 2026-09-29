@@ -7,7 +7,6 @@
 	<div class="topbar">
 		<a href="/"><img src={logo} alt="Capoeira Colectiva" class="logo" /></a>
 		<div class="topbar-right">
-			<a href="/members/descargas" class="top-link" class:active={tab === 'descargas'}>⬇</a>
 			<a href="/members/mi-perfil" class="top-link" class:active={tab === 'perfil'} title="Ajustes">⚙</a>
 		</div>
 	</div>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { user } from '$lib/stores/auth';
 
 	const inUniverso = $derived($page.url.pathname.startsWith('/universo'));
 </script>
@@ -13,13 +12,7 @@
 		{:else}
 			<a href="/universo" class="center">Universo Colectivo</a>
 		{/if}
-		<div class="right">
-			{#if $user}
-				<a href="/members/rutinas" class="btn-entrar">Miembros</a>
-			{:else}
-				<a href="/login" class="btn-entrar">Entrar</a>
-			{/if}
-		</div>
+		<div class="right"></div>
 	</div>
 </nav>
 
