@@ -1,6 +1,5 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
-	import { loading } from '$lib/stores/auth';
 
 	let { children } = $props();
 </script>
@@ -54,10 +53,4 @@
 	}
 </style>
 
-{#if $loading}
-	<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#333">
-		Cargando…
-	</div>
-{:else}
-	{@render children()}
-{/if}
+{@render children()}

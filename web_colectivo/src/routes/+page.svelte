@@ -4,12 +4,10 @@
 </svelte:head>
 
 <script lang="ts">
-	import { loading } from '$lib/stores/auth';
 	import PublicNav from '$lib/PublicNav.svelte';
 	import logo from '$lib/assets/logo.svg';
 </script>
 
-{#if !$loading}
 <PublicNav />
 
 <main>
@@ -28,16 +26,8 @@
 	<section class="info">
 		<div class="card">
 			<div>
-				<h2>Lunes y martes</h2>
-				<a href="https://maps.app.goo.gl/sqwXTZ1iwfUsEWWm6" target="_blank" rel="noopener noreferrer" class="place">Ermita de la Virgen del Puerto</a>
-				<p class="detail">20:30 – 22:00</p>
-			</div>
-		</div>
-
-		<div class="card">
-			<div>
-				<h2>Jueves</h2>
-				<a href="https://maps.app.goo.gl/rhzQdLUEA3A6PGno8" target="_blank" rel="noopener noreferrer" class="place">SOMA SHC</a>
+				<h2>Lunes y jueves</h2>
+				<a href="https://maps.app.goo.gl/bRTa2HJnmhZTVYX16" target="_blank" rel="noopener noreferrer" class="place">El Girasol</a>
 				<p class="detail">20:00 – 22:00</p>
 			</div>
 		</div>
@@ -57,7 +47,6 @@
 		</a>
 	</section>
 </main>
-{/if}
 
 <style>
 	main {
